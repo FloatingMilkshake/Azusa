@@ -1,9 +1,6 @@
 ﻿services:
   bot:
     image: ghcr.io/floatingmilkshake/azusa
-    depends_on:
-      redis:
-        condition: service_healthy
     restart: on-failure
     volumes:
       - type: bind
@@ -13,19 +10,6 @@
       - type: bind
         source: ./config.json
         target: /app/config.json
-  redis:
-    image: redis:alpine
-    restart: always
-    volumes:
-      - type: bind
-        source: ./db
-        target: /data
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    command: --appendonly yes
   watchtower:
     image: containrrr/watchtower
     volumes:
