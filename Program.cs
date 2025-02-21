@@ -1,0 +1,78 @@
+﻿namespace Azusa;
+
+public static class Program
+{
+#pragma warning disable CA2211 // Non-constant fields should not be visible
+    // ReSharper disable InconsistentNaming
+    public static EventId BotEventId { get; } = new(1000, "Azusa");
+    public static ConfigJson ConfigJson;
+    public static DiscordClient Discord;
+    public static readonly HttpClient HttpClient = new();
+    public static MinioClient Minio;
+    // ReSharper enable InconsistentNaming
+#pragma warning restore CA2211 // Non-constant fields should not be visible
+    
+    internal static async Task Main()
+    {
+        // Read config.json
+        string json;
+        await using (var fs = File.OpenRead("config.json"))
+        using (StreamReader sr = new(fs, new UTF8Encoding(false)))
+            json = await sr.ReadToEndAsync();
+
+        ConfigJson = JsonConvert.DeserializeObject<ConfigJson>(json);
+
+        if (ConfigJson is null)
+        {
+            Discord.Logger.LogCritical(
+                // ReSharper disable once LogMessageIsSentenceProblem
+                "config.json is malformed. Please be sure it has all of the required values.");
+            Environment.Exit(1);
+        }
+        
+        Minio = new MinioClient()
+            .WithEndpoint(ConfigJson.S3.Endpoint)
+            .WithCredentials(ConfigJson.S3.AccessKey, ConfigJson.S3.SecretKey)
+            .WithRegion(ConfigJson.S3.Region)
+            .WithSSL();
+        
+        var clientBuilder = DiscordClientBuilder.CreateDefault(ConfigJson.Token, DiscordIntents.All);
+#if DEBUG
+        clientBuilder.SetLogLevel(LogLevel.Debug);
+#else
+        clientBuilder.SetLogLevel(LogLevel.Information);
+#endif
+        clientBuilder.ConfigureExtraFeatures(config =>
+        {
+            config.LogUnknownEvents = false;
+            config.LogUnknownAuditlogs = false;
+        });
+        clientBuilder.UseInteractivity(new InteractivityConfiguration
+        {
+            PollBehaviour = PollBehaviour.KeepEmojis,
+            Timeout = TimeSpan.FromSeconds(30)
+        });
+        clientBuilder.UseCommands((_, extension) =>
+        {
+            // Register commands
+            var commandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t =>
+                t.IsClass && t.Namespace is not null && t.Namespace.Contains("Azusa.Commands") &&
+                !t.IsNested).ToList();
+            
+            extension.AddCommands(commandTypes, 1342179809618559026);
+            
+            TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
+            {
+                PrefixResolver = new DefaultPrefixResolver(true, ["a!", "az"]).ResolvePrefixAsync
+            });
+            extension.AddProcessor(textCommandProcessor);
+        });
+        
+        // Build the client
+        Discord = clientBuilder.Build();
+        
+        // Connect
+        await Discord.ConnectAsync();
+        await Task.Delay(Timeout.InfiniteTimeSpan);
+    }
+}
