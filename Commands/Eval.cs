@@ -1,6 +1,6 @@
 namespace Azusa.Commands;
 
-public static class EvalCommands // TODO: how do you globally ignore these? this one isnt an error i can fix, this class IS used by D#+ but Rider doesnt know that
+public static class Eval // TODO: how do you globally ignore these? this one isnt an error i can fix, this class IS used by D#+ but Rider doesnt know that
 {
     private static readonly List<string> RestrictedTerms = ["poweroff", "shutdown", "reboot", "halt"];
     public static readonly string[] EvalImports = ["System", "System.Collections.Generic", "System.Linq",

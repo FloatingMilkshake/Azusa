@@ -3,13 +3,13 @@ using DSharpPlus.Commands.Trees;
 
 namespace Azusa.Commands;
 
-public class HelpCommands
+public class Help
 {
     // Most of this is taken from DSharpPlus.CommandsNext and adapted to fit here.
     // https://github.com/DSharpPlus/DSharpPlus/blob/1c1aa15/DSharpPlus.CommandsNext/CommandsNextExtension.cs#L829
     [Command("help"), Description("Displays command help.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public async Task Help(CommandContext ctx, [Description("Command to provide help for."), RemainingText] string command = "")
+    public async Task HelpCommand(CommandContext ctx, [Description("Command to provide help for."), RemainingText] string command = "")
     {
         var commandSplit = command.Split(' ');
 

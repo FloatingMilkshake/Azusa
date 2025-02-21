@@ -1,11 +1,11 @@
 namespace Azusa.Commands;
 
-public class PingCommands
+public class Ping
 {
     [Command("ping")]
     [Description("Pong!")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public async Task Ping(TextCommandContext ctx)
+    public async Task PingCommand(TextCommandContext ctx)
     {
         await ctx.RespondAsync("Ping!");
         var msg = await ctx.GetResponseAsync();
