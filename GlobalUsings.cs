@@ -4,10 +4,10 @@ global using DSharpPlus.Commands;
 global using DSharpPlus.Commands.ArgumentModifiers;
 global using DSharpPlus.Commands.ContextChecks;
 global using DSharpPlus.Commands.Processors.TextCommands;
-global 
-    using DSharpPlus.Commands.Processors.TextCommands.Parsing;
+global using DSharpPlus.Commands.Processors.TextCommands.Parsing;
 global using DSharpPlus.Commands.Trees.Metadata;
 global using DSharpPlus.Entities;
+global using DSharpPlus.Exceptions;
 global using DSharpPlus.Interactivity;
 global using DSharpPlus.Interactivity.Enums;
 global using DSharpPlus.Interactivity.EventHandling;
