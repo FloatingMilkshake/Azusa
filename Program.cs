@@ -30,6 +30,16 @@ public static class Program
             Environment.Exit(1);
         }
         
+        // Check for dev mode
+#if !DEBUG
+        var devMode = (await (await HttpClient.GetAsync("https://haste.floatingmilkshake.com/raw/azusaDevModeEnabled")).Content.ReadAsStringAsync() == "true");
+        while (devMode)
+        {
+            await Task.Delay(10000);
+            devMode = (await (await HttpClient.GetAsync("https://haste.floatingmilkshake.com/raw/azusaDevModeEnabled")).Content.ReadAsStringAsync() == "true");
+        }
+#endif
+        
         Minio = new MinioClient()
             .WithEndpoint(ConfigJson.S3.Endpoint)
             .WithCredentials(ConfigJson.S3.AccessKey, ConfigJson.S3.SecretKey)
