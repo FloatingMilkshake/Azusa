@@ -5,6 +5,9 @@ public class ConfigJson
     [JsonProperty("token")]
     public string Token { get; private set; }
     
+    [JsonProperty("canvas")]
+    public Canvas Canvas { get; set; }
+    
     [JsonProperty("hastebin")]
     public Hastebin Hastebin { get; set; }
     
@@ -13,6 +16,18 @@ public class ConfigJson
     
     [JsonProperty("workerLinks")]
     public WorkerLinks WorkerLinks { get; set; }
+}
+
+public class Canvas
+{
+    [JsonProperty("canvasDomain")]
+    public string CanvasDomain { get; set; }
+    
+    [JsonProperty("cloudflareAccessClientId")]
+    public string CloudflareAccessClientId { get; set; }
+    
+    [JsonProperty("cloudflareAccessClientSecret")]
+    public string CloudflareAccessClientSecret { get; set; }
 }
 
 public class Hastebin
