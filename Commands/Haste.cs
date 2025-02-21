@@ -3,7 +3,7 @@ namespace Azusa.Commands;
 [Command("haste")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [Description("Commands for managing Hastebin content.")]
-public class HasteCommands
+public static class HasteCommands
 {
     private static readonly string HasteApiEndpoint = "https://api.cloudflare.com/client/v4/accounts/{0}/storage/kv/namespaces/{1}/values/documents:{2}";
     

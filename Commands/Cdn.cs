@@ -3,7 +3,7 @@
 [Command("cdn")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [Description("Manage files uploaded to Amazon S3-compatible cloud storage.")]
-public partial class Cdn
+public static partial class Cdn
 {
     [Command("upload")]
     [Description("Upload a file to Amazon S3-compatible cloud storage.")]
@@ -28,8 +28,11 @@ public partial class Cdn
 
         if (file is not null) link = file.Url;
 
-        link = link.Replace("<", "");
-        link = link.Replace(">", "");
+        if (link is not null)
+        {
+            link = link.Replace("<", "");
+            link = link.Replace(">", "");
+        }
 
         string fileName;
 
@@ -45,7 +48,7 @@ public partial class Cdn
             // Regex partially taken from https://stackoverflow.com/a/26253039
             var fileNamePattern = FileNamePattern();
 
-            var fileNameAndExtension = fileNamePattern.Match(link).Value;
+            var fileNameAndExtension = fileNamePattern.Match(link ?? "").Value;
 
             // From here on out we can be sure that 'fileNameAndExtension' is in the format 'example.png'.
 
@@ -194,6 +197,7 @@ public partial class Cdn
     // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/3335c38/src/Modules/Owner.cs#L313)
     private readonly struct CloudflareContent(List<string> urls)
     {
+        // ReSharper disable once UnusedMember.Local
         public List<string> Files { get; } = urls;
     }
 }

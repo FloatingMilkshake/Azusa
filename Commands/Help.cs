@@ -3,13 +3,13 @@ using DSharpPlus.Commands.Trees;
 
 namespace Azusa.Commands;
 
-public class Help
+public static class Help
 {
     // Most of this is taken from DSharpPlus.CommandsNext and adapted to fit here.
     // https://github.com/DSharpPlus/DSharpPlus/blob/1c1aa15/DSharpPlus.CommandsNext/CommandsNextExtension.cs#L829
     [Command("help"), Description("Displays command help.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public async Task HelpCommand(CommandContext ctx, [Description("Command to provide help for."), RemainingText] string command = "")
+    public static async Task HelpCommand(CommandContext ctx, [Description("Command to provide help for."), RemainingText] string command = "")
     {
         var commandSplit = command.Split(' ');
 
@@ -59,7 +59,7 @@ public class Help
                 helpEmbed.Description += "\n\nThis group can be executed as a standalone command.";
             }
 
-            var aliases = cmd.Method?.GetCustomAttributes<TextAliasAttribute>().FirstOrDefault()?.Aliases ?? (cmd.Attributes.FirstOrDefault(x => x is TextAliasAttribute) as TextAliasAttribute)?.Aliases ?? null;
+            var aliases = cmd.Method?.GetCustomAttributes<TextAliasAttribute>().FirstOrDefault()?.Aliases ?? (cmd.Attributes.FirstOrDefault(x => x is TextAliasAttribute) as TextAliasAttribute)?.Aliases;
             if (aliases is not null && (aliases.Length > 1 || (aliases.Length == 1 && aliases[0] != cmd.Name)))
             {
                 var aliasStr = "";
@@ -124,7 +124,6 @@ public class Help
                 if (!executionChecks.Any())
                 {
                     eligibleCommands.Add(sc);
-                    continue;
                 }
             }
 

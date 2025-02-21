@@ -3,7 +3,7 @@
 [Command("link")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [Description("Set, update, or delete a short link.")]
-public class Link
+public static class Link
 {
     [Command("set")]
     [Description("Set or update a short link.")]
