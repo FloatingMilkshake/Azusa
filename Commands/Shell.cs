@@ -66,30 +66,10 @@ public class Shell
     }
 }
 
-internal class ShellCommandResponse
+internal class ShellCommandResponse(int exitCode, string output)
 {
-    public ShellCommandResponse(int exitCode, string output, string error)
-    {
-        ExitCode = exitCode;
-        Output = output;
-        Error = error;
-    }
-    
-    public ShellCommandResponse(int exitCode, string output)
-    {
-        ExitCode = exitCode;
-        Output = output;
-        Error = default;
-    }
+    public ShellCommandResponse() : this(0, null) { }
 
-    public ShellCommandResponse()
-    {
-        ExitCode = default;
-        Output = default;
-        Error = default;
-    }
-
-    public int ExitCode { get; set; }
-    public string Output { get; set; }
-    public string Error { get; set; }
+    public int ExitCode { get; } = exitCode;
+    public string Output { get; } = output;
 }

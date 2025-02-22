@@ -9,7 +9,7 @@ public static class Dev
     [RequireApplicationOwner]
     public static async Task DevCommand(TextCommandContext ctx, [Parameter("state"), Description("The new state of dev mode to set. Use `check` to check state.")] string devModeEnabled)
     {
-        if (devModeEnabled is "on" or "enable" or "enable" or "true" or "yes" or "y")
+        if (devModeEnabled is "on" or "enable" or "true" or "yes" or "y")
         {
             var request = new HttpRequestMessage(HttpMethod.Put, HasteUrl);
             request.Content = new StringContent("true");
