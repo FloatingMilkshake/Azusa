@@ -9,7 +9,7 @@ public static class Help
     // https://github.com/DSharpPlus/DSharpPlus/blob/1c1aa15/DSharpPlus.CommandsNext/CommandsNextExtension.cs#L829
     [Command("help"), Description("Displays command help.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public static async Task HelpCommand(CommandContext ctx, [Description("Command to provide help for."), RemainingText] string command = "")
+    public static async Task HelpCommand(TextCommandContext ctx, [Description("Command to provide help for."), RemainingText] string command = "")
     {
         var commandSplit = command.Split(' ');
 
@@ -44,6 +44,18 @@ public static class Help
                     break;
                 }
 
+                // Only run checks on the last command in the chain.
+                // So if we are looking at a command group here, only run checks against the actual command,
+                // not the group(s) it's under.
+                if (i == commandSplit.Length - 1)
+                {
+                    IEnumerable<ContextCheckAttribute> failedChecks = (CheckPermissions(ctx, cmd)).ToList();
+                    if (failedChecks.Any())
+                    {
+                        return;
+                    }
+                }
+                
                 searchIn = cmd.Subcommands.Any() ? cmd.Subcommands : null;
             }
 
@@ -124,6 +136,13 @@ public static class Help
                 if (!executionChecks.Any())
                 {
                     eligibleCommands.Add(sc);
+                    continue;
+                }
+                
+                IEnumerable<ContextCheckAttribute> candidateFailedChecks = CheckPermissions(ctx, sc);
+                if (!candidateFailedChecks.Any())
+                {
+                    eligibleCommands.Add(sc);
                 }
             }
 
@@ -144,5 +163,36 @@ public static class Help
         DiscordMessageBuilder builder = new DiscordMessageBuilder().AddEmbed(helpEmbed);
 
         await ctx.RespondAsync(builder);
+    }
+    
+    private static IEnumerable<ContextCheckAttribute> CheckPermissions(TextCommandContext ctx, Command command)
+    {
+        var contextChecks = command.Attributes.Where(x => x is ContextCheckAttribute);
+        var failedChecks = new List<ContextCheckAttribute>();
+        
+        foreach (var check in contextChecks)
+        {
+            if (check is RequirePermissionsAttribute requirePermissionsAttribute)
+            {
+                if (ctx.Member is null || ctx.Guild is null
+                    || !ctx.Channel.PermissionsFor(ctx.Member).HasAllPermissions(requirePermissionsAttribute.UserPermissions)
+                    || !ctx.Channel.PermissionsFor(ctx.Guild.CurrentMember).HasAllPermissions(requirePermissionsAttribute.BotPermissions))
+                {
+                    failedChecks.Add(requirePermissionsAttribute);
+                }
+            }
+
+            if (check is RequireApplicationOwnerAttribute requireApplicationOwnerAttribute)
+            {
+                // null-forgiving here is fine because im the only one using this bot & its not in a team
+                // ReSharper disable once SimplifyLinqExpressionUseAll
+                if (!Program.Discord.CurrentApplication.Owners!.Any(x => x.Id == ctx.User.Id))
+                {
+                    failedChecks.Add(requireApplicationOwnerAttribute);
+                }
+            }
+        }
+
+        return failedChecks;
     }
 }
