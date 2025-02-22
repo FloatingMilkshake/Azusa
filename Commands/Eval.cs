@@ -56,21 +56,13 @@ public static class Eval
                 }
                 
                 // Respond in channel if content length within Discord character limit
-                await ctx.RespondAsync(HideSensitiveInfo(result.ReturnValue.ToString()) ?? "null");
+                await ctx.RespondAsync(result.ReturnValue.ToString() ?? "null");
             }
         }
         catch (Exception e)
         {
             await ctx.RespondAsync(e.GetType() + ": " + e.Message);
         }
-    }
-    
-    private static string HideSensitiveInfo(string input)
-    {
-        const string redacted = "[redacted]";
-        var output = input.Replace(Program.ConfigJson.Token, redacted);
-
-        return output;
     }
 }
 
