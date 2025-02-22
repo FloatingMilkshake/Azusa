@@ -1,4 +1,3 @@
-global using Azusa.Helpers;
 global using DSharpPlus;
 global using DSharpPlus.Commands;
 global using DSharpPlus.Commands.ArgumentModifiers;
