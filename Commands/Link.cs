@@ -9,15 +9,15 @@ public static class Link
     [Command("set")]
     [Description("Set or update a short link.")]
     public static async Task SetWorkerLink(TextCommandContext ctx,
-        [Parameter("key"), Description("Set a custom key for the short link.")]
+        [Parameter("key")] [Description("Set a custom key for the short link.")]
         string key,
-        [Parameter("url"), Description("The URL the short link should point to.")]
+        [Parameter("url")] [Description("The URL the short link should point to.")]
         string url)
     {
         if (url.Contains('<')) url = url.Replace("<", "");
 
         if (url.Contains('>')) url = url.Replace(">", "");
-        
+
         if (key[0] == '/') key = key[1..];
 
         if (Program.ConfigJson.WorkerLinks.BaseUrl is null)
@@ -56,7 +56,7 @@ public static class Link
             await ctx.RespondAsync($"An exception occurred while trying to send the request! `{ex.GetType()}: {ex.Message}`");
             return;
         }
-        
+
         var httpStatusCode = (int)response.StatusCode;
         var httpStatus = response.StatusCode.ToString();
         var responseText = await response.Content.ReadAsStringAsync();
@@ -72,7 +72,7 @@ public static class Link
     [Command("delete")]
     [Description("Delete a short link.")]
     public static async Task DeleteWorkerLink(TextCommandContext ctx,
-        [Parameter("link"), Description("The key or URL of the short link to delete.")]
+        [Parameter("link")] [Description("The key or URL of the short link to delete.")]
         string url)
     {
         if (url[0] == '/') url = url[1..];
@@ -105,7 +105,7 @@ public static class Link
             await ctx.RespondAsync($"An exception occurred while trying to send the request! `{ex.GetType()}: {ex.Message}`");
             return;
         }
-        
+
         var httpStatusCode = (int)response.StatusCode;
         var httpStatus = response.StatusCode.ToString();
         var responseText = await response.Content.ReadAsStringAsync();
@@ -121,11 +121,13 @@ public static class Link
     [Command("list")]
     [Description("List all short links.")]
     public static async Task ListWorkerLinks(TextCommandContext ctx,
-        [Parameter("match_keys"), Description("Optionally filter by key.")] string keyFilter = "",
-        [Parameter("match_values"), Description("Optionally filter by value.")] string valueFilter = "")
+        [Parameter("match_keys")] [Description("Optionally filter by key.")]
+        string keyFilter = "",
+        [Parameter("match_values")] [Description("Optionally filter by value.")]
+        string valueFilter = "")
     {
         await ctx.RespondAsync("Working on it...");
-        
+
         var requestUri =
             $"https://api.cloudflare.com/client/v4/accounts/{Program.ConfigJson.WorkerLinks.AccountId}/storage/kv/namespaces/{Program.ConfigJson.WorkerLinks.NamespaceId}/keys";
         HttpRequestMessage request = new(HttpMethod.Get, requestUri);
@@ -143,7 +145,7 @@ public static class Link
         foreach (var item in parsedResponse.Result)
         {
             var key = item.Name.Replace("/", "%2F");
-            
+
             // Check key filter; if key does not match, skip
             if (!string.IsNullOrWhiteSpace(keyFilter) && !key.Contains(keyFilter.Replace("/", "%2F"))) continue;
 
@@ -157,10 +159,10 @@ public static class Link
 
             var value = await valueResponse.Content.ReadAsStringAsync();
             value = value.Replace(value, $"<{value}>");
-            
+
             // Check value filter; if value does not match, skip
             if (!string.IsNullOrWhiteSpace(valueFilter) && !value.Contains(valueFilter)) continue;
-            
+
             kvListResponse += $"**{item.Name}**: {value}\n\n";
         }
 
@@ -175,11 +177,11 @@ public static class Link
         {
             embed.Description = "No links matched the specified filters.";
             embed.Color = DiscordColor.Red;
-            
+
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
             return;
         }
-        
+
         try
         {
             var pages = InteractivityExtension.GeneratePagesInEmbed(kvListResponse, SplitType.Line, embed).ToList();
@@ -210,11 +212,13 @@ public static class Link
 
     public class CloudflareResponse
     {
-        [JsonProperty("result")] public List<KvEntry> Result { get; set; }
+        [JsonProperty("result")]
+        public List<KvEntry> Result { get; set; }
     }
 
     public class KvEntry
     {
-        [JsonProperty("name")] public string Name { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
     }
 }

@@ -7,9 +7,10 @@ public static class Help
 {
     // Most of this is taken from DSharpPlus.CommandsNext and adapted to fit here.
     // https://github.com/DSharpPlus/DSharpPlus/blob/1c1aa15/DSharpPlus.CommandsNext/CommandsNextExtension.cs#L829
-    [Command("help"), Description("Displays command help.")]
+    [Command("help")]
+    [Description("Displays command help.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public static async Task HelpCommand(TextCommandContext ctx, [Description("Command to provide help for."), RemainingText] string command = "")
+    public static async Task HelpCommand(TextCommandContext ctx, [Description("Command to provide help for.")] [RemainingText] string command = "")
     {
         var commandSplit = command.Split(' ');
 
@@ -19,15 +20,15 @@ public static class Help
             Color = new DiscordColor("#0080ff")
         };
 
-        IEnumerable<Command> cmds = ctx.Extension.Commands.Values.Where(cmd =>
-             cmd.Attributes.Any(attr => attr is AllowedProcessorsAttribute apAttr
-                                        && apAttr.Processors.Contains(typeof(TextCommandProcessor))));
+        var cmds = ctx.Extension.Commands.Values.Where(cmd =>
+            cmd.Attributes.Any(attr => attr is AllowedProcessorsAttribute apAttr
+                                       && apAttr.Processors.Contains(typeof(TextCommandProcessor))));
 
         if (commandSplit.Length != 0 && commandSplit[0] != "")
         {
             Command cmd = null;
-            IEnumerable<Command> searchIn = cmds;
-            for (int i = 0; i < commandSplit.Length; i++)
+            var searchIn = cmds;
+            for (var i = 0; i < commandSplit.Length; i++)
             {
                 if (searchIn is null)
                 {
@@ -35,41 +36,33 @@ public static class Help
                     break;
                 }
 
-                StringComparison comparison = StringComparison.InvariantCultureIgnoreCase;
-                StringComparer comparer = StringComparer.InvariantCultureIgnoreCase;
+                var comparison = StringComparison.InvariantCultureIgnoreCase;
+                var comparer = StringComparer.InvariantCultureIgnoreCase;
                 cmd = searchIn.FirstOrDefault(xc => xc.Name.Equals(commandSplit[i], comparison) || ((xc.Attributes.FirstOrDefault(x => x is TextAliasAttribute) as TextAliasAttribute)?.Aliases.Contains(commandSplit[i], comparer) ?? false));
 
                 if (cmd is null)
-                {
                     break;
-                }
 
                 // Only run checks on the last command in the chain.
                 // So if we are looking at a command group here, only run checks against the actual command,
                 // not the group(s) it's under.
                 if (i == commandSplit.Length - 1)
                 {
-                    IEnumerable<ContextCheckAttribute> failedChecks = (CheckPermissions(ctx, cmd)).ToList();
+                    IEnumerable<ContextCheckAttribute> failedChecks = CheckPermissions(ctx, cmd).ToList();
                     if (failedChecks.Any())
-                    {
                         return;
-                    }
                 }
-                
+
                 searchIn = cmd.Subcommands.Any() ? cmd.Subcommands : null;
             }
 
             if (cmd is null)
-            {
                 throw new CommandNotFoundException(string.Join(" ", commandSplit));
-            }
 
             helpEmbed.Description = $"`{cmd.Name}`: {cmd.Description ?? "No description provided."}";
 
             if (cmd.Subcommands.Count > 0 && cmd.Subcommands.Any(subCommand => subCommand.Attributes.Any(attr => attr is DefaultGroupCommandAttribute)))
-            {
                 helpEmbed.Description += "\n\nThis group can be executed as a standalone command.";
-            }
 
             var aliases = cmd.Method?.GetCustomAttributes<TextAliasAttribute>().FirstOrDefault()?.Aliases ?? (cmd.Attributes.FirstOrDefault(x => x is TextAliasAttribute) as TextAliasAttribute)?.Aliases;
             if (aliases is not null && (aliases.Length > 1 || (aliases.Length == 1 && aliases[0] != cmd.Name)))
@@ -82,6 +75,7 @@ public static class Help
 
                     aliasStr += $"`{alias}`, ";
                 }
+
                 aliasStr = aliasStr.TrimEnd(',', ' ');
                 helpEmbed.AddField("Aliases", aliasStr);
             }
@@ -95,7 +89,7 @@ public static class Help
                     if (arg.ParameterType == typeof(CommandContext) || arg.ParameterType.IsSubclassOf(typeof(CommandContext)))
                         continue;
 
-                    bool isCatchAll = arg.GetCustomAttribute<RemainingTextAttribute>() != null;
+                    var isCatchAll = arg.GetCustomAttribute<RemainingTextAttribute>() != null;
                     argumentsStr += $"{(arg.IsOptional || isCatchAll ? " [" : " <")}{arg.Name}{(isCatchAll ? "..." : "")}{(arg.IsOptional || isCatchAll ? "]" : ">")}";
                 }
 
@@ -116,20 +110,18 @@ public static class Help
             if (cmd.Subcommands.Any())
             {
                 var subCommands = cmd.Subcommands.OrderBy(x => x.Name).ToList();
-                string cmdList = "";
+                var cmdList = "";
                 foreach (var subCommand in subCommands)
-                {
                     cmdList += $"`{subCommand.Name}`, ";
-                }
                 helpEmbed.AddField("Subcommands", cmdList.TrimEnd(',', ' '));
                 //helpBuilder.WithSubcommands(eligibleCommands.OrderBy(xc => xc.Name));
             }
         }
         else
         {
-            IEnumerable<Command> commandsToSearch = cmds;
+            var commandsToSearch = cmds;
             List<Command> eligibleCommands = [];
-            foreach (Command sc in commandsToSearch)
+            foreach (var sc in commandsToSearch)
             {
                 var executionChecks = sc.Attributes.Where(x => x is ContextCheckAttribute);
 
@@ -138,59 +130,47 @@ public static class Help
                     eligibleCommands.Add(sc);
                     continue;
                 }
-                
-                IEnumerable<ContextCheckAttribute> candidateFailedChecks = CheckPermissions(ctx, sc);
+
+                var candidateFailedChecks = CheckPermissions(ctx, sc);
                 if (!candidateFailedChecks.Any())
-                {
                     eligibleCommands.Add(sc);
-                }
             }
 
             if (eligibleCommands.Count != 0)
             {
                 eligibleCommands = eligibleCommands.OrderBy(x => x.Name).ToList();
-                string cmdList = "";
+                var cmdList = "";
                 foreach (var eligibleCommand in eligibleCommands)
-                {
                     cmdList += $"`{eligibleCommand.Name}`, ";
-                }
                 helpEmbed.AddField("Commands", cmdList.TrimEnd(',', ' '));
                 helpEmbed.Description = "Listing all top-level commands and groups. Specify a command to see more information.";
                 //helpBuilder.WithSubcommands(eligibleCommands.OrderBy(xc => xc.Name));
             }
         }
 
-        DiscordMessageBuilder builder = new DiscordMessageBuilder().AddEmbed(helpEmbed);
+        var builder = new DiscordMessageBuilder().AddEmbed(helpEmbed);
 
         await ctx.RespondAsync(builder);
     }
-    
+
     private static IEnumerable<ContextCheckAttribute> CheckPermissions(TextCommandContext ctx, Command command)
     {
         var contextChecks = command.Attributes.Where(x => x is ContextCheckAttribute);
         var failedChecks = new List<ContextCheckAttribute>();
-        
+
         foreach (var check in contextChecks)
         {
             if (check is RequirePermissionsAttribute requirePermissionsAttribute)
-            {
                 if (ctx.Member is null || ctx.Guild is null
-                    || !ctx.Channel.PermissionsFor(ctx.Member).HasAllPermissions(requirePermissionsAttribute.UserPermissions)
-                    || !ctx.Channel.PermissionsFor(ctx.Guild.CurrentMember).HasAllPermissions(requirePermissionsAttribute.BotPermissions))
-                {
+                                       || !ctx.Channel.PermissionsFor(ctx.Member).HasAllPermissions(requirePermissionsAttribute.UserPermissions)
+                                       || !ctx.Channel.PermissionsFor(ctx.Guild.CurrentMember).HasAllPermissions(requirePermissionsAttribute.BotPermissions))
                     failedChecks.Add(requirePermissionsAttribute);
-                }
-            }
 
             if (check is RequireApplicationOwnerAttribute requireApplicationOwnerAttribute)
-            {
                 // null-forgiving here is fine because im the only one using this bot & its not in a team
                 // ReSharper disable once SimplifyLinqExpressionUseAll
                 if (!Program.Discord.CurrentApplication.Owners!.Any(x => x.Id == ctx.User.Id))
-                {
                     failedChecks.Add(requireApplicationOwnerAttribute);
-                }
-            }
         }
 
         return failedChecks;

@@ -9,11 +9,11 @@ public static partial class Cdn
     [Command("upload")]
     [Description("Upload a file to Amazon S3-compatible cloud storage.")]
     public static async Task Upload(TextCommandContext ctx,
-        [Parameter("name"), Description("The name for the uploaded file.")]
+        [Parameter("name")] [Description("The name for the uploaded file.")]
         string name,
-        [Parameter("link"), Description("A link to a file to upload.")]
+        [Parameter("link")] [Description("A link to a file to upload.")]
         string link = null,
-        [Parameter("file"), Description("A direct file to upload. This will override a link if both are provided!")]
+        [Parameter("file")] [Description("A direct file to upload. This will override a link if both are provided!")]
         DiscordAttachment file = null)
     {
         if (file is null && link is null)
@@ -21,11 +21,9 @@ public static partial class Cdn
             await ctx.RespondAsync("You must provide a link or file to upload!");
             return;
         }
-        
+
         if (name.Contains(' '))
-        {
             await ctx.RespondAsync("The name of the file cannot contain spaces! Please try again.");
-        }
 
         if (file is not null) link = file.Url;
 
@@ -54,23 +52,21 @@ public static partial class Cdn
             // From here on out we can be sure that 'fileNameAndExtension' is in the format 'example.png'.
 
             var extension = Path.GetExtension(fileNameAndExtension);
-            
+
             // The user might have included an extension in their desired filename. We should remove it.
             // We should not just match `extension` because the user may have provided a different one!
             // Let's use regex instead.
             var fileExtensionPattern = FileExtensionPattern();
             var userExtension = fileExtensionPattern.Match(name).Value;
             if (userExtension != "")
-            {
                 name = name.Replace(userExtension, "");
-            }
 
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
             fileName = name switch
             {
                 "random" or "generate" => new string(Enumerable.Repeat(chars, 10)
-                    .Select(s => s[(new Random()).Next(s.Length)])
+                    .Select(s => s[new Random().Next(s.Length)])
                     .ToArray()) + extension,
                 "preserve" => fileNameAndExtension,
                 _ => name + extension
@@ -102,7 +98,7 @@ public static partial class Cdn
     [Command("delete")]
     [Description("Delete a file from Amazon S3-compatible cloud storage.")]
     public static async Task DeleteUpload(TextCommandContext ctx,
-        [Parameter("file"), Description("The file to delete.")]
+        [Parameter("file")] [Description("The file to delete.")]
         string fileToDelete)
     {
         fileToDelete = fileToDelete.Replace("<", "").Replace(">", "");
@@ -148,7 +144,7 @@ public static partial class Cdn
             var responseText = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
-                await ctx.EditResponseAsync($"File deleted successfully!\nCloudflare cache purged!");
+                await ctx.EditResponseAsync("File deleted successfully!\nCloudflare cache purged!");
             else
                 await ctx.EditResponseAsync($"File deleted successfully!\nAn API error occured when purging Cloudflare cache: ```json\n{responseText}```");
         }
@@ -162,7 +158,7 @@ public static partial class Cdn
     [Command("check")]
     [Description("Check whether a file exists in your S3 bucket. Uses the S3 API to avoid caching.")]
     public static async Task CdnPreview(TextCommandContext ctx,
-        [Parameter("name"), Description("The name (or link) of the file to check.")]
+        [Parameter("name")] [Description("The name (or link) of the file to check.")]
         string name)
     {
         if (name.Contains(Program.ConfigJson.S3.BaseUrl))
@@ -189,10 +185,10 @@ public static partial class Cdn
 
     [GeneratedRegex(@"[^/\\&\?#]+\.\w*(?=([\?&#].*$|$))")]
     private static partial Regex FileNamePattern();
-    
+
     [GeneratedRegex(@"\.\w*(?=([\?&#].*$|$))")]
     private static partial Regex FileExtensionPattern();
-    
+
     // This code is taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L197,
     // minus some minor changes.
     // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/3335c38/src/Modules/Owner.cs#L313)

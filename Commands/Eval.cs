@@ -3,15 +3,20 @@ namespace Azusa.Commands;
 public static class Eval
 {
     private static readonly List<string> RestrictedTerms = ["poweroff", "shutdown", "reboot", "halt"];
-    public static readonly string[] EvalImports = ["System", "System.Collections.Generic", "System.Linq",
+
+    private static readonly string[] EvalImports =
+    [
+        "System", "System.Collections.Generic", "System.Linq",
         "System.Text", "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.Commands",
         "DSharpPlus.Entities", "Microsoft.Extensions.Logging", "Newtonsoft.Json",
-        Assembly.GetExecutingAssembly().GetName().Name];
-    
-    [Command("eval"), Description("Evaluate C# code.")]
+        Assembly.GetExecutingAssembly().GetName().Name
+    ];
+
+    [Command("eval")]
+    [Description("Evaluate C# code.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
-    public static async Task EvalCommand(TextCommandContext ctx, [Parameter("code"), Description("The code to evaluate."), RemainingText] string code)
+    public static async Task EvalCommand(TextCommandContext ctx, [Parameter("code")] [Description("The code to evaluate.")] [RemainingText] string code)
     {
         if (RestrictedTerms.Any(code.Contains))
         {
@@ -42,19 +47,19 @@ public static class Eval
                 {
                     // Isn't null, so it has to be whitespace
                     await ctx.RespondAsync($"\"{result.ReturnValue}\"");
-                    
+
                     return;
                 }
-                
+
                 // Content is too long for Discord
                 if (result.ReturnValue.ToString()!.Length > 1900)
                 {
                     Program.Discord.Logger.LogInformation(Program.BotEventId, "Eval result (too long for Discord): {result}", result.ReturnValue);
-                    
+
                     await ctx.RespondAsync("Done, but the result was too long to post here! Logged to console instead.");
                     return;
                 }
-                
+
                 // Respond in channel if content length within Discord character limit
                 await ctx.RespondAsync(result.ReturnValue.ToString() ?? "null");
             }
