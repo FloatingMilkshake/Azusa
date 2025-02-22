@@ -8,14 +8,14 @@ public class Shell
     [Command("shell")]
     [TextAlias("sh")]
     [Description("Run a shell command.")]
+    [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
     public static async Task ShellCommand(TextCommandContext ctx,
         [Parameter("command"), Description("The command to run, including any arguments.")] string command)
     {
         var cmdResponse = await ShellCommand(command);
-        string response;
-        
-        response = cmdResponse.Output.Length > 1900
+
+        var response = cmdResponse.Output.Length > 1900
             ? $"Finished with exit code `{cmdResponse.ExitCode}`, but the output was too long to post here."
             : $"Finished with exit code `{cmdResponse.ExitCode}`! Output: ```\n{cmdResponse.Output}```";
         
