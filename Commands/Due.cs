@@ -4,7 +4,7 @@ public static class Due
 {
     [Command("due"), Description("Get due assignments from Canvas.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public static async Task DueCommand(TextCommandContext ctx, [Parameter("filter"), Description("The time to filter by.")] string filter)
+    public static async Task DueCommand(TextCommandContext ctx, [Parameter("filter"), Description("The time to filter by."), RemainingText] string filter)
     {
         await ctx.RespondAsync("Working on it...");
         
