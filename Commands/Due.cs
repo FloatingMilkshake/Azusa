@@ -6,6 +6,8 @@ public static class Due
     [AllowedProcessors(typeof(TextCommandProcessor))]
     public static async Task DueCommand(TextCommandContext ctx, [Parameter("filter"), Description("The time to filter by.")] string filter)
     {
+        await ctx.RespondAsync("Working on it...");
+        
         var request = new HttpRequestMessage(HttpMethod.Get, Program.ConfigJson.Canvas.CanvasDomain);
         request.Headers.Add("X-Filter", filter);
         request.Headers.Add("CF-Access-Client-Id", Program.ConfigJson.Canvas.CloudflareAccessClientId);
@@ -17,14 +19,14 @@ public static class Due
             var data = await response.Content.ReadAsStringAsync();
             if (data.Contains("<title>Sign in ・ Cloudflare Access</title>"))
             {
-                await ctx.RespondAsync("Blocked by Cloudflare Access! Check your Service Token.");
+                await ctx.EditResponseAsync("Blocked by Cloudflare Access! Check your Service Token.");
                 return;
             }
-            await ctx.RespondAsync(data);
+            await ctx.EditResponseAsync(data);
         }
         else
         {
-            await ctx.RespondAsync($"`{(int)response.StatusCode} {response.ReasonPhrase}`");
+            await ctx.EditResponseAsync($"`{(int)response.StatusCode} {response.ReasonPhrase}`");
         }
     }
 }
