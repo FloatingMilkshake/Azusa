@@ -11,15 +11,17 @@ public class Shell
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
     public static async Task ShellCommand(TextCommandContext ctx,
-        [Parameter("command"), Description("The command to run, including any arguments.")] string command)
+        [Parameter("command"), Description("The command to run, including any arguments."), RemainingText] string command)
     {
+        await ctx.RespondAsync("Working on it...");
+        
         var cmdResponse = await ShellCommand(command);
 
         var response = cmdResponse.Output.Length > 1900
             ? $"Finished with exit code `{cmdResponse.ExitCode}`, but the output was too long to post here."
             : $"Finished with exit code `{cmdResponse.ExitCode}`! Output: ```\n{cmdResponse.Output}```";
         
-        await ctx.FollowupAsync(new DiscordFollowupMessageBuilder().WithContent(response));
+        await ctx.EditResponseAsync(response);
     }
 
     private static async Task<ShellCommandResponse> ShellCommand(string command)
