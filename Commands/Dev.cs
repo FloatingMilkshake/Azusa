@@ -6,6 +6,7 @@ public static class Dev
 
     [Command("dev"), Description("Toggle the state of dev mode. Prod will disconnect from Discord for the duration of dev mode.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
+    [RequireApplicationOwner]
     public static async Task DevCommand(TextCommandContext ctx, [Parameter("state"), Description("The new state of dev mode to set. Use `check` to check state.")] string devModeEnabled)
     {
         if (devModeEnabled is "on" or "enable" or "enable" or "true" or "yes" or "y")

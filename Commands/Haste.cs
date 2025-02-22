@@ -2,6 +2,7 @@ namespace Azusa.Commands;
 
 [Command("haste")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
+[RequireApplicationOwner]
 [Description("Commands for managing Hastebin content.")]
 public static class HasteCommands
 {

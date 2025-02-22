@@ -4,6 +4,7 @@ public static class Purge
 {
     [Command("purge"), Description("Purge some messages.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
+    [RequirePermissions(DiscordPermission.ManageMessages)]
     public static async Task PurgeCommand(TextCommandContext ctx, [Parameter("startingMessage"), Description("Where to delete down from. Exclusive.")] ulong startingMessage)
     {
         IReadOnlyList<DiscordMessage> msgs;

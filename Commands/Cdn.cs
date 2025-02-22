@@ -3,6 +3,7 @@
 [Command("cdn")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [Description("Manage files uploaded to Amazon S3-compatible cloud storage.")]
+[RequireApplicationOwner]
 public static partial class Cdn
 {
     [Command("upload")]

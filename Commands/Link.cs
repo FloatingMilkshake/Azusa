@@ -3,6 +3,7 @@
 [Command("link")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [Description("Set, update, or delete a short link.")]
+[RequireApplicationOwner]
 public static class Link
 {
     [Command("set")]
