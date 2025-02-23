@@ -15,14 +15,14 @@ public static class StringHelpers
                 // If the output was meant to be in a code block (beginning of complete output string begins with ```)
                 // then put each output segment into a code block
                         
-                var length = Math.Min(1980, input.Length - i);
+                var length = Math.Min(maxLength, input.Length - i);
                 var segment = input.Substring(i, length);
                 var codeBlockRegex = new Regex("```.*$");
                 if (codeBlockRegex.IsMatch(input.Split('\n')[0]))
                 {
                     if (i == 0)
                         segment = $"{segment}\n```";
-                    else if (i + 1980 > input.Length)
+                    else if (i + maxLength > input.Length)
                         segment = $"{codeBlockRegex.Match(input.Split('\n')[0])}\n{segment}";
                     else
                         segment = $"{codeBlockRegex.Match(input.Split('\n')[0])}\n{segment}```";
