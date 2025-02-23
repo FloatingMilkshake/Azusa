@@ -14,15 +14,21 @@ public class Shell
         [Parameter("command")] [Description("The command to run, including any arguments.")] [RemainingText]
         string command)
     {
-        await ctx.RespondAsync("Working on it...");
+        await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
 
         var cmdResponse = await ShellCommand(command);
-
-        var response = cmdResponse.Output.Length > 1900
-            ? $"Finished with exit code `{cmdResponse.ExitCode}`, but the output was too long to post here."
-            : $"Finished with exit code `{cmdResponse.ExitCode}`! Output: ```\n{cmdResponse.Output}```";
-
-        await ctx.EditResponseAsync(response);
+        
+        try
+        {
+            await StringHelpers.SplitStringAsync(cmdResponse.Output, true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
+        }
+        catch
+        {
+            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
+            return;
+        }
+        
+        await ctx.Message.DeleteReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"), ctx.Client.CurrentUser);
     }
 
     private static async Task<ShellCommandResponse> ShellCommand(string command)

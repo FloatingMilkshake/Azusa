@@ -23,6 +23,8 @@ public static class Eval
             await ctx.RespondAsync("Sorry, denying this to be safe.");
             return;
         }
+        
+        await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
 
         try
         {
@@ -51,23 +53,23 @@ public static class Eval
                     return;
                 }
 
-                // Content is too long for Discord
-                if (result.ReturnValue.ToString()!.Length > 1900)
-                {
-                    Program.Discord.Logger.LogInformation(Program.BotEventId, "Eval result (too long for Discord): {result}", result.ReturnValue);
-
-                    await ctx.RespondAsync("Done, but the result was too long to post here! Logged to console instead.");
-                    return;
-                }
-
-                // Respond in channel if content length within Discord character limit
-                await ctx.RespondAsync(result.ReturnValue.ToString() ?? "null");
+                await StringHelpers.SplitStringAsync(result.ReturnValue.ToString(), true, ctx: ctx);
             }
         }
         catch (Exception e)
         {
-            await ctx.RespondAsync(e.GetType() + ": " + e.Message);
+            try
+            {
+                await ctx.RespondAsync(e.GetType() + ": " + e.Message);
+            }
+            catch
+            {
+                await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
+                return;
+            }
         }
+        
+        await ctx.Message.DeleteReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"), ctx.Client.CurrentUser);
     }
 }
 
