@@ -9,33 +9,41 @@ public static class StringHelpers
         
         if (input.Length > maxLength)
         {
-            // Split into multiple messages
-            for (int i = 0; i < input.Length; i += maxLength)
+            // Split by lines
+            // If adding a line to the current element in `split` does not put it over `maxLength`, do so
+            // If it does put it over `maxLength`, move on to the next element
+            var currentElement = "";
+            var lines = input.Split('\n');
+            string codeBlockStart = null;
+            
+            // If input is a code block, record the start line (backticks & language) for later & remove it & the last line (ending backticks) from the list
+            var codeBlockRegex = new Regex("```.*$");
+            var match = codeBlockRegex.Match(lines.First());
+            if (match.Success)
             {
-                // If the output was meant to be in a code block (beginning of complete output string begins with ```)
-                // then put each output segment into a code block
-
-                // Length of this segment is max length OR the length of whatever is left if < maxLength; whichever is smaller
-                var length = Math.Min(maxLength, input.Length - i);
-                var segment = input.Substring(i, length);
-                
-                // Detect code blocks
-                var codeBlockRegex = new Regex("```.*$");
-                if (codeBlockRegex.IsMatch(input.Split('\n')[0]))
-                {
-                    // Do not add backticks to start of first segment; they are already there
-                    if (i == 0)
-                        segment = $"{segment}\n```";
-                    // Do not add backticks to end of last segment; they are already there
-                    else if (i + maxLength > input.Length)
-                        segment = $"{codeBlockRegex.Match(input.Split('\n')[0])}\n{segment}";
-                    // Add backticks to beginning 
-                    else
-                        segment = $"{codeBlockRegex.Match(input.Split('\n')[0])}\n{segment}```";
-                }
-                        
-                split.Add(segment);
+                codeBlockStart = match.Value;
+                lines = lines.Skip(1).Take(lines.Length - 2).ToArray();
             }
+            
+            foreach (var line in lines)
+            {
+                if (currentElement.Length + line.Length + 20 < maxLength) // + 20 for newline & extra space for code block start
+                {
+                    currentElement += line + '\n';
+                }
+                else
+                {
+                    split.Add(codeBlockStart is null
+                        ? currentElement
+                        : $"{codeBlockStart}\n{currentElement}```");
+                    currentElement = line + '\n';
+                }
+            }
+            
+            // `currentElement` is left with a final group of lines in it; add it to `split` too
+            split.Add(codeBlockStart is null
+                ? currentElement
+                : $"{codeBlockStart}\n{currentElement}```");
         }
         else
         {
