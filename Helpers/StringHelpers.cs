@@ -14,16 +14,22 @@ public static class StringHelpers
             {
                 // If the output was meant to be in a code block (beginning of complete output string begins with ```)
                 // then put each output segment into a code block
-                        
+
+                // Length of this segment is max length OR the length of whatever is left if < maxLength; whichever is smaller
                 var length = Math.Min(maxLength, input.Length - i);
                 var segment = input.Substring(i, length);
+                
+                // Detect code blocks
                 var codeBlockRegex = new Regex("```.*$");
                 if (codeBlockRegex.IsMatch(input.Split('\n')[0]))
                 {
+                    // Do not add backticks to start of first segment; they are already there
                     if (i == 0)
                         segment = $"{segment}\n```";
+                    // Do not add backticks to end of last segment; they are already there
                     else if (i + maxLength > input.Length)
                         segment = $"{codeBlockRegex.Match(input.Split('\n')[0])}\n{segment}";
+                    // Add backticks to beginning 
                     else
                         segment = $"{codeBlockRegex.Match(input.Split('\n')[0])}\n{segment}```";
                 }
