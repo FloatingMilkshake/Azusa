@@ -64,6 +64,10 @@ public static class Program
             PollBehaviour = PollBehaviour.KeepEmojis,
             Timeout = TimeSpan.FromSeconds(30)
         });
+        clientBuilder.ConfigureEventHandlers((builder) =>
+        {
+            builder.HandleMessageCreated(MessageEvents.MessageCreated);
+        });
         clientBuilder.UseCommands((_, extension) =>
         {
             // Register commands

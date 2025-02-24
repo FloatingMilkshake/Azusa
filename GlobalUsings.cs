@@ -1,3 +1,5 @@
+global using Azusa.Constants;
+global using Azusa.Events;
 global using Azusa.Helpers;
 global using DSharpPlus;
 global using DSharpPlus.Commands;
