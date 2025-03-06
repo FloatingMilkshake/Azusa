@@ -31,7 +31,7 @@ public class Shell
         await ctx.Message.DeleteReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"), ctx.Client.CurrentUser);
     }
 
-    private static async Task<ShellCommandResponse> ShellCommand(string command)
+    public static async Task<ShellCommandResponse> ShellCommand(string command)
     {
         var osDescription = RuntimeInformation.OSDescription;
         string fileName;
@@ -73,7 +73,7 @@ public class Shell
     }
 }
 
-internal class ShellCommandResponse(int exitCode, string output)
+public class ShellCommandResponse(int exitCode, string output)
 {
     public ShellCommandResponse() : this(0, null)
     {

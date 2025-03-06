@@ -28,6 +28,7 @@ global using System.Diagnostics;
 global using System.IO;
 global using System.Linq;
 global using System.Net.Http;
+global using System.Net.Sockets;
 global using System.Reflection;
 global using System.Runtime.InteropServices;
 global using System.Text;
