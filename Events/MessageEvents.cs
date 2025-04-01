@@ -76,7 +76,9 @@ public static class MessageEvents
         await Task.Delay(1000);
         await msg.ModifyEmbedSuppressionAsync(true);
         
-        if (e.Message.Embeds.Any(x => x.Description?.Contains("please note", StringComparison.OrdinalIgnoreCase) ?? false))
+        if (e.Message.Embeds.Any(x => 
+                (x.Description?.Contains("please note", StringComparison.OrdinalIgnoreCase) ?? false) ||
+                (x.Description?.Contains("note:", StringComparison.OrdinalIgnoreCase) ?? false)))
             await msg.CreateReactionAsync(DiscordEmoji.FromName(client, ":bangbang:"));
         
         #endregion insider RSS feed parsing for /announcebuild
