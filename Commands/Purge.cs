@@ -11,7 +11,7 @@ public static class Purge
         IReadOnlyList<DiscordMessage> msgs;
         try
         {
-            msgs = await ctx.Channel.GetMessagesAfterAsync(startingMessage).ToListAsync();
+            msgs = await ctx.Channel.GetMessagesAfterAsync(startingMessage, int.MaxValue).ToListAsync();
         }
         catch (Exception ex) when (ex is UnauthorizedException || ex.InnerException is UnauthorizedException)
         {
