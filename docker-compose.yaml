@@ -10,10 +10,12 @@
       - type: bind
         source: ./config.json
         target: /app/config.json
+    labels: [ "com.centurylinklabs.watchtower.scope=azusa" ]
   watchtower:
     image: containrrr/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/config.json:/config.json
-    command: --interval 30 --label-enable
+    command: --interval 30 --label-enable --scope azusa
     restart: always
+    labels: [ "com.centurylinklabs.watchtower.scope=azusa" ]
