@@ -6,12 +6,17 @@ public static class Purge
     [Description("Purge some messages.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequirePermissions(DiscordPermission.ManageMessages)]
-    public static async Task PurgeCommand(TextCommandContext ctx, [Parameter("startingMessage")] [Description("Where to delete down from. Exclusive.")] ulong startingMessage)
+    public static async Task PurgeCommand(TextCommandContext ctx, [Parameter("startingMessage")] [Description("Where to delete down from. Exclusive.")] ulong startingMessageOrCount)
     {
+        await ctx.Message.DeleteAsync();
+        
         IReadOnlyList<DiscordMessage> msgs;
         try
         {
-            msgs = await ctx.Channel.GetMessagesAfterAsync(startingMessage, int.MaxValue).ToListAsync();
+            if (startingMessageOrCount <= 2000)
+                msgs = await ctx.Channel.GetMessagesAsync(Convert.ToInt32(startingMessageOrCount)).ToListAsync();
+            else
+                msgs = await ctx.Channel.GetMessagesAfterAsync(startingMessageOrCount, int.MaxValue).ToListAsync();
         }
         catch (Exception ex) when (ex is UnauthorizedException || ex.InnerException is UnauthorizedException)
         {
