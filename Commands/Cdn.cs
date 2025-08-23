@@ -71,13 +71,17 @@ public static partial class Cdn
                 "preserve" => fileNameAndExtension,
                 _ => name + extension
             };
+            
+            var mimeType = MimeTypeMap.GetMimeType(extension);
+            if (mimeType == "application/octet-stream")
+                mimeType = null;
 
             var args = new PutObjectArgs()
                 .WithBucket(bucket)
                 .WithObject(fileName)
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
-                .WithContentType(MimeTypeMap.GetMimeType(extension));
+                .WithContentType(mimeType);
 
             await Program.Minio.PutObjectAsync(args);
         }
