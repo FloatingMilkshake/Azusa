@@ -7,15 +7,15 @@
 public static partial class Cdn
 {
     [Command("upload")]
-    [Description("Upload a file to Amazon S3-compatible cloud storage.")]
+    [Description("Upload a file to Amazon S3-compatible cloud storage. An uploaded file attachment will override the `link` argument!")]
     public static async Task Upload(TextCommandContext ctx,
         [Parameter("name")] [Description("The name for the uploaded file.")]
         string name,
         [Parameter("link")] [Description("A link to a file to upload.")]
-        string link = null,
-        [Parameter("file")] [Description("A direct file to upload. This will override a link if both are provided!")]
-        DiscordAttachment file = null)
+        string link = null)
     {
+        var file = ctx.Message.Attachments.FirstOrDefault();
+        
         if (file is null && link is null)
         {
             await ctx.RespondAsync("You must provide a link or file to upload!");
