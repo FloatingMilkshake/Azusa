@@ -36,15 +36,7 @@ public static class Dev
             Environment.Exit(1);
 #endif
         }
-        else if (devModeEnabled == "check")
-        {
-            var enabled = await (await Program.HttpClient.GetAsync("https://haste.floatingmilkshake.com/raw/azusaDevModeEnabled")).Content.ReadAsStringAsync() == "true";
-            if (enabled)
-                await ctx.RespondAsync("Dev mode is enabled!");
-            else
-                await ctx.RespondAsync("Dev mode is disabled!");
-        }
-        else
+        else if (devModeEnabled is "off" or "disable" or "false" or "no" or "n")
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, HasteUrl);
             request.Headers.Add("Authorization", $"Bearer {Program.ConfigJson.Hastebin.Token}");
@@ -69,6 +61,18 @@ public static class Dev
 #if DEBUG
             Environment.Exit(0);
 #endif
+        }
+        else if (devModeEnabled is "check")
+        {
+            var enabled = await (await Program.HttpClient.GetAsync("https://haste.floatingmilkshake.com/raw/azusaDevModeEnabled")).Content.ReadAsStringAsync() == "true";
+            if (enabled)
+                await ctx.RespondAsync("Dev mode is enabled!");
+            else
+                await ctx.RespondAsync("Dev mode is disabled!");
+        }
+        else
+        {
+            await ctx.RespondAsync("Invalid");
         }
     }
 }
