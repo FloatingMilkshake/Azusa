@@ -62,9 +62,13 @@ public static class Dev
             }
 
 #if DEBUG
-            outMsg += " This instance is running in dev mode already. It will not be stopped! Please stop it manually to avoid conflicts.";
+            outMsg += " Stopping...";
 #endif
             await ctx.RespondAsync(outMsg);
+            
+#if DEBUG
+            Environment.Exit(0);
+#endif
         }
     }
 }
