@@ -58,5 +58,9 @@ public static class Purge
         }
 
         await ctx.RespondAsync($"Purged {numDeleted} messages!");
+        await Task.Delay(5000);
+        var msg = await ctx.GetResponseAsync();
+        if (msg is not null)
+            await msg.DeleteAsync();
     }
 }
