@@ -75,7 +75,7 @@ public static class Program
                 t.IsClass && t.Namespace is not null && t.Namespace.Contains("Azusa.Commands") &&
                 !t.IsNested).ToList();
 
-            extension.AddCommands(commandTypes, 1342179809618559026);
+            extension.AddCommands(commandTypes, 799644062973427743);
 
             TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
             {
