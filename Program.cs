@@ -4,11 +4,11 @@ public static class Program
 {
 #pragma warning disable CA2211 // Non-constant fields should not be visible
     // ReSharper disable InconsistentNaming
-    public static EventId BotEventId { get; } = new(1000, "Azusa");
-    public static ConfigJson ConfigJson;
-    public static DiscordClient Discord;
-    public static readonly HttpClient HttpClient = new();
-    public static MinioClient Minio;
+    internal static EventId BotEventId { get; } = new(1000, "Azusa");
+    internal static ConfigJson ConfigJson;
+    internal static DiscordClient Discord;
+    internal static readonly HttpClient HttpClient = new();
+    internal static MinioClient Minio;
     // ReSharper enable InconsistentNaming
 #pragma warning restore CA2211 // Non-constant fields should not be visible
 
