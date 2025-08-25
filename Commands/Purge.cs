@@ -6,6 +6,7 @@ public static class Purge
     [Description("Purge some messages.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequirePermissions(DiscordPermission.ManageMessages)]
+    [TextAlias("delete", "clear", "del")]
     public static async Task PurgeCommand(TextCommandContext ctx, [Parameter("startingMessage")] [Description("Where to delete down from. Exclusive.")] ulong startingMessageOrCount)
     {
         await ctx.Message.DeleteAsync();
