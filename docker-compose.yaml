@@ -10,6 +10,9 @@
       - type: bind
         source: ./config.json
         target: /app/config.json
+      - type: bind
+        source: ./id_ed25519
+        target: /root/.ssh/id_ed25519
     labels: [ "com.centurylinklabs.watchtower.scope=azusa" ]
   watchtower:
     image: containrrr/watchtower
