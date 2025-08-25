@@ -129,6 +129,16 @@ public static class Link
         [Parameter("match_values")] [Description("Optionally filter by value.")]
         string valueFilter = "")
     {
+        if (ctx.Channel.Id != 1409317970844319815)
+        {
+            var msgBefore = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Id, 2).FirstOrDefaultAsync();
+            if (msgBefore is not null && msgBefore.Author.Id == 455432936339144705 && msgBefore.Content != "yes")
+            {
+                await ctx.RespondAsync("you sure? ~> <#1409317970844319815>");
+                return;
+            }
+        }
+        
         await ctx.RespondAsync("Working on it...");
 
         var requestUri =
