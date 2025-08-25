@@ -58,7 +58,17 @@ public class Err
             return $"```\n{result.Output}\n```";
 
         // Failure; show more detail to bot owners
-        return $"Error lookup failed with exit code `{result.ExitCode}`: {(string.IsNullOrWhiteSpace(result.Output) ? "[no output]" : "\n```\n{result.Output}\n```")}";
+        
+        string output = $"Error lookup failed with exit code `{result.ExitCode}`: ";
+        
+        if (string.IsNullOrWhiteSpace(result.Output))
+            output += "[no output]";
+        else
+            output += $"\n```\n{result.Output}\n```";
+        
+        if (!string.IsNullOrWhiteSpace(result.Error))
+            output += $"\nError: {result.Error}";
 
+        return output;
     }
 }

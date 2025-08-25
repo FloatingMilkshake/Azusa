@@ -67,18 +67,20 @@ public class Shell
 
         proc.Start();
         var result = await proc.StandardOutput.ReadToEndAsync();
+        var error = await proc.StandardError.ReadToEndAsync();
         await proc.WaitForExitAsync();
 
-        return new ShellCommandResponse(proc.ExitCode, result);
+        return new ShellCommandResponse(proc.ExitCode, result, error);
     }
 }
 
-public class ShellCommandResponse(int exitCode, string output)
+public class ShellCommandResponse(int exitCode, string output, string error)
 {
-    public ShellCommandResponse() : this(0, null)
+    public ShellCommandResponse() : this(0, null, null)
     {
     }
 
     public int ExitCode { get; } = exitCode;
     public string Output { get; } = output;
+    public string Error { get; } = error;
 }
