@@ -10,6 +10,7 @@ public static class HasteCommands
 
     [Command("create")]
     [Description("Create a new paste.")]
+    [TextAlias("new", "n", "c")]
     public static async Task HasteCreate(TextCommandContext ctx,
         [Parameter("content")] [Description("The content of the new paste.")]
         string content,
@@ -35,6 +36,7 @@ public static class HasteCommands
 
     [Command("delete")]
     [Description("Delete a paste.")]
+    [TextAlias("del", "d")]
     public static async Task HasteDelete(TextCommandContext ctx,
         [Parameter("key")] [Description("The key of the paste to delete. Accepts formats \"documents:abc\" or \"abc\".")]
         string key)
