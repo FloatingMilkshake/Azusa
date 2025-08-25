@@ -2,7 +2,7 @@ namespace Azusa.Commands;
 
 public static class Eval
 {
-    private static readonly List<string> RestrictedTerms = ["poweroff", "shutdown", "reboot", "halt", "id_ed25519"];
+    internal static readonly List<string> RestrictedTerms = ["poweroff", "shutdown", "reboot", "halt", "id_ed25519", "ssh_key"];
 
     private static readonly string[] EvalImports =
     [
