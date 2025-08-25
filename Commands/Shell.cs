@@ -20,7 +20,7 @@ public class Shell
         
         try
         {
-            await StringHelpers.SplitStringAsync(cmdResponse.Output, true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
+            await StringHelpers.SplitStringAsync($"{cmdResponse.Output}\n{cmdResponse.Error}", true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
         }
         catch
         {
