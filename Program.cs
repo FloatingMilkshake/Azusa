@@ -79,7 +79,7 @@ public static class Program
 
             TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
             {
-                PrefixResolver = new DefaultPrefixResolver(true, "a!", "az").ResolvePrefixAsync
+                PrefixResolver = new DefaultPrefixResolver(true, "a!", "az", "azusa").ResolvePrefixAsync
             });
             extension.AddProcessor(textCommandProcessor);
         });
