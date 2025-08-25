@@ -2,12 +2,12 @@
 
 [Command("cdn")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
-[Description("Manage files uploaded to Amazon S3-compatible cloud storage.")]
+[Description("Manage files uploaded to R2.")]
 [RequireApplicationOwner]
 public static partial class Cdn
 {
     [Command("upload")]
-    [Description("Upload a file to Amazon S3-compatible cloud storage. An uploaded file attachment will override the `link` argument!")]
+    [Description("Upload a file to R2. An uploaded file attachment will override the `link` argument!")]
     public static async Task Upload(TextCommandContext ctx,
         [Parameter("name")] [Description("The name for the uploaded file.")]
         string name,
@@ -100,7 +100,7 @@ public static partial class Cdn
     }
 
     [Command("delete")]
-    [Description("Delete a file from Amazon S3-compatible cloud storage.")]
+    [Description("Delete a file from R2.")]
     public static async Task DeleteUpload(TextCommandContext ctx,
         [Parameter("file")] [Description("The file to delete.")]
         string fileToDelete)
@@ -160,7 +160,7 @@ public static partial class Cdn
     }
 
     [Command("check")]
-    [Description("Check whether a file exists in your S3 bucket. Uses the S3 API to avoid caching.")]
+    [Description("Check whether a file exists in the R2 bucket. Uses the R2 API to avoid caching.")]
     public static async Task CdnPreview(TextCommandContext ctx,
         [Parameter("name")] [Description("The name (or link) of the file to check.")]
         string name)
