@@ -8,6 +8,7 @@ public static class Link
 {
     [Command("set")]
     [Description("Set or update a short link.")]
+    [TextAlias("create", "add", "s", "c", "a")]
     public static async Task SetWorkerLink(TextCommandContext ctx,
         [Parameter("key")] [Description("Set a custom key for the short link.")]
         string key,
@@ -71,6 +72,7 @@ public static class Link
 
     [Command("delete")]
     [Description("Delete a short link.")]
+    [TextAlias("del", "d")]
     public static async Task DeleteWorkerLink(TextCommandContext ctx,
         [Parameter("link")] [Description("The key or URL of the short link to delete.")]
         string url)
@@ -120,6 +122,7 @@ public static class Link
 
     [Command("list")]
     [Description("List all short links.")]
+    [TextAlias("l", "all")]
     public static async Task ListWorkerLinks(TextCommandContext ctx,
         [Parameter("match_keys")] [Description("Optionally filter by key.")]
         string keyFilter = "",
