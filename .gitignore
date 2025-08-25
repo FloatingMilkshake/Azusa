@@ -5,7 +5,6 @@
 config.json
 .DS_Store
 .idea/
-id_ed25519
 
 ### Csharp ###
 ## Ignore Visual Studio temporary files, build results, and
