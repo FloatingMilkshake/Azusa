@@ -28,16 +28,12 @@ public static class WakeUp
         var response = await ctx.GetResponseAsync();
         
         // Ping to see if it woke up
-        var cmdOut = await Shell.ShellCommand($"ping {Program.ConfigJson.Err.SshHost} -c 10");
+        var command = $"ping -c 10 {Program.ConfigJson.Err.SshHost}";
+        var cmdOut = await Shell.ShellCommand(command);
         
         if (cmdOut.Output.Contains("64 bytes from"))
-        {
             await response.ModifyAsync("Alright, trying... it worked!");
-            return;
-        }
         else
-        {
             await response.ModifyAsync($"Alright, trying... it didn't work!\nExited `{cmdOut.ExitCode}`: {cmdOut.Error.Trim()}");
-        }
     }
 }
