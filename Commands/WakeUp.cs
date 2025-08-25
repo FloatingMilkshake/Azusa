@@ -37,7 +37,7 @@ public static class WakeUp
         }
         else
         {
-            await response.ModifyAsync("Alright, trying... it didn't work!");
+            await response.ModifyAsync($"Alright, trying... it didn't work!\nExited `{cmdOut.ExitCode}`: {cmdOut.Error.Trim()}");
         }
     }
 }
