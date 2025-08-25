@@ -8,6 +8,7 @@ public static partial class Cdn
 {
     [Command("upload")]
     [Description("Upload a file to R2. An uploaded file attachment will override the `link` argument!")]
+    [TextAlias("up", "u")]
     public static async Task Upload(TextCommandContext ctx,
         [Parameter("name")] [Description("The name for the uploaded file.")]
         string name,
@@ -101,6 +102,7 @@ public static partial class Cdn
 
     [Command("delete")]
     [Description("Delete a file from R2.")]
+    [TextAlias("del", "d")]
     public static async Task DeleteUpload(TextCommandContext ctx,
         [Parameter("file")] [Description("The file to delete.")]
         string fileToDelete)
@@ -161,6 +163,7 @@ public static partial class Cdn
 
     [Command("check")]
     [Description("Check whether a file exists in the R2 bucket. Uses the R2 API to avoid caching.")]
+    [TextAlias("c")]
     public static async Task CdnPreview(TextCommandContext ctx,
         [Parameter("name")] [Description("The name (or link) of the file to check.")]
         string name)
