@@ -9,7 +9,7 @@ public static class Explode
     public static async Task PingCommand(TextCommandContext ctx)
     {
         var rand = new Random();
-        var chance = rand.Next(3);
+        var chance = rand.Next(4);
         
         switch (chance)
         {
@@ -20,6 +20,9 @@ public static class Explode
                 await ctx.RespondAsync(":boom:");
                 break;
             case 2:
+                await ctx.RespondAsync("<:cat:1230731441344610374>");
+                break;
+            case 3:
                 chance = rand.Next(5);
                 if (chance == 2)
                     await ctx.RespondAsync("DID SOMEBODY SAY BOOM?");
