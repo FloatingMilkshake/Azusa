@@ -5,6 +5,7 @@ public static class Ping
     [Command("ping")]
     [Description("Pong!")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
+    [TextAlias("pingf")]
     public static async Task PingCommand(TextCommandContext ctx)
     {
         await ctx.RespondAsync("Ping!");
