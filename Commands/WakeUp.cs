@@ -6,6 +6,7 @@ public static class WakeUp
     [Description("wake up wake up wake up wake up")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [TextAlias("wake", "wol", "w")]
+    [RequireApplicationOwner]
     public static async Task WakeUpCommand(TextCommandContext ctx)
     {
         // Parse MAC address to byte array
