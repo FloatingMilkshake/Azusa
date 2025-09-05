@@ -26,7 +26,7 @@ public class Shell
         
         try
         {
-            await StringHelpers.SplitStringAsync($"{cmdResponse.Output}\n{cmdResponse.Error}", true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
+            await StringHelpers.SplitStringAsync($"```\n{cmdResponse.Output}\n{cmdResponse.Error}\n```", true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
         }
         catch
         {
