@@ -64,7 +64,10 @@ public static class StringHelpers
         {
             await ctx.RespondAsync(split.First());
             foreach (var message in split.Skip(1))
+            {
+                await Task.Delay(2000);
                 await ctx.Channel.SendMessageAsync(message);
+            }
             if (completionMessage is not null)
                 await ctx.RespondAsync(completionMessage);
         }
