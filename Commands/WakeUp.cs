@@ -18,7 +18,7 @@ public static class WakeUp
         if (wakeResult.ExitCode == 0)
         {
             // Ping to see if it woke up
-            var command = $"ping -c 10 {Program.ConfigJson.Err.SshHost}";
+            var command = $"ping -c 10 {Program.ConfigJson.Err.SshHost}.{Program.ConfigJson.TailnetName}";
             var pingResult = await Shell.ShellCommand(command);
         
             if (pingResult.Output.Contains("64 bytes from"))
