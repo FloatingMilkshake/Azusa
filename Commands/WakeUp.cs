@@ -9,32 +9,31 @@ public static class WakeUp
     [RequireApplicationOwner]
     public static async Task WakeUpCommand(TextCommandContext ctx)
     {
-        // Parse MAC address to byte array
-        byte[] mac = Program.ConfigJson.Err.MacAddress.Split(':')
-            .Select(b => Convert.ToByte(b, 16))
-            .ToArray();
-
-        // Create the magic packet
-        byte[] packet = new byte[102];
-        for (int i = 0; i < 6; i++) packet[i] = 0xFF;
-        for (int i = 6; i < 102; i++) packet[i] = mac[i % mac.Length];
-
-        // Send the magic packet
-        using var client = new UdpClient();
-        client.Connect(Program.ConfigJson.Err.IpAddress, Program.ConfigJson.Err.Port);
-        await client.SendAsync(packet, packet.Length);
-        
         await ctx.RespondAsync("Alright, trying...");
+        
+        var wakeResult = await DoWakeup();
         
         var response = await ctx.GetResponseAsync();
         
-        // Ping to see if it woke up
-        var command = $"ping -c 10 {Program.ConfigJson.Err.SshHost}";
-        var cmdOut = await Shell.ShellCommand(command);
+        if (wakeResult.ExitCode == 0)
+        {
+            // Ping to see if it woke up
+            var command = $"ping -c 10 {Program.ConfigJson.Err.SshHost}";
+            var pingResult = await Shell.ShellCommand(command);
         
-        if (cmdOut.Output.Contains("64 bytes from"))
-            await response.ModifyAsync("Alright, trying... it worked!");
+            if (pingResult.Output.Contains("64 bytes from"))
+                await response.ModifyAsync("Alright, trying... it worked!");
+            else
+                await response.ModifyAsync($"Alright, trying... it didn't work!\nExited `{pingResult.ExitCode}`: {pingResult.Error.Trim()}");
+        }
         else
-            await response.ModifyAsync($"Alright, trying... it didn't work!\nExited `{cmdOut.ExitCode}`: {cmdOut.Error.Trim()}");
+        {
+            await response.ModifyAsync($"Alright, trying... it didn't work!\nExited `{wakeResult.ExitCode}`: {wakeResult.Error.Trim()}");
+        }
+    }
+    
+    internal static async Task<ShellCommandResponse> DoWakeup()
+    {
+        return await Shell.ShellCommand($"ssh -o IdentityAgent=none {Program.ConfigJson.WakeOnLan.RelayUsername}@{Program.ConfigJson.WakeOnLan.RelayHost}.{Program.ConfigJson.TailnetName} \"wakeonlan {Program.ConfigJson.WakeOnLan.TargetMacAddress}\"");
     }
 }

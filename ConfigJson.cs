@@ -8,8 +8,14 @@ public class ConfigJson
     [JsonProperty("canvas")]
     public Canvas Canvas { get; set; }
     
+    [JsonProperty("tailnetName")]
+    public string TailnetName { get; private set; }
+    
     [JsonProperty("err")]
     public Err Err { get; set; }
+    
+    [JsonProperty("wakeOnLan")]
+    public WakeOnLan WakeOnLan { get; set; }
 
     [JsonProperty("hastebin")]
     public Hastebin Hastebin { get; set; }
@@ -35,20 +41,23 @@ public class Canvas
 
 public class Err
 {
-    [JsonProperty("ipAddress")]
-    public string IpAddress { get; private set; }
-    
-    [JsonProperty("macAddress")]
-    public string MacAddress { get; private set; }
-    
-    [JsonProperty("port")]
-    public int Port { get; private set; }
-    
     [JsonProperty("sshHost")]
     public string SshHost { get; private set; }
     
     [JsonProperty("sshUsername")]
     public string SshUsername { get; private set; }
+}
+
+public class WakeOnLan
+{
+    [JsonProperty("relayHost")]
+    public string RelayHost { get; private set; }
+    
+    [JsonProperty("relayUsername")]
+    public string RelayUsername { get; private set; }
+    
+    [JsonProperty("targetMacAddress")]
+    public string TargetMacAddress { get; private set; }
 }
 
 public class Hastebin

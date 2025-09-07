@@ -10,21 +10,7 @@ public class Err
         await ctx.RespondAsync("Working on it...");
         
         // Shoot a wake on LAN packet to the Windows machine to ensure it is awake
-        
-        // Parse MAC address to byte array
-        byte[] mac = Program.ConfigJson.Err.MacAddress.Split(':')
-            .Select(b => Convert.ToByte(b, 16))
-            .ToArray();
-
-        // Create the magic packet
-        byte[] packet = new byte[102];
-        for (int i = 0; i < 6; i++) packet[i] = 0xFF;
-        for (int i = 6; i < 102; i++) packet[i] = mac[i % mac.Length];
-
-        // Send the magic packet
-        using var client = new UdpClient();
-        client.Connect(Program.ConfigJson.Err.IpAddress, Program.ConfigJson.Err.Port);
-        await client.SendAsync(packet, packet.Length);
+        await WakeUp.DoWakeup();
         
         // Sanitize input
         code = code.Replace("\"", "").Replace(";", "").Replace("&", "").Replace("|", "").Replace("&&", "").Replace("||", "");
