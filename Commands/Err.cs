@@ -16,7 +16,7 @@ public class Err
         code = code.Replace("\"", "").Replace(";", "").Replace("&", "").Replace("|", "").Replace("&&", "").Replace("||", "");
         
         // SSH into the Windows machine and run the tool
-        var cmd = $"ssh -o ConnectTimeout=30 {Program.ConfigJson.Err.SshUsername}@{Program.ConfigJson.Err.SshHost} \"$PSStyle.OutputRendering = \"PlainText\"; C:\\err.exe {code} 2>&1 | Out-String\"";
+        var cmd = $"ssh -o ConnectTimeout=30 {Program.ConfigJson.Err.SshUsername}@{Program.ConfigJson.Err.SshHost}.{Program.ConfigJson.TailnetName} \"$PSStyle.OutputRendering = \"PlainText\"; C:\\err.exe {code} 2>&1 | Out-String\"";
         var result = await Shell.ShellCommand(cmd);
         
         var response = GetErrorMessage(result);
