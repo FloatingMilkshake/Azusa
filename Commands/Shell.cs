@@ -14,12 +14,6 @@ public class Shell
         [Parameter("command")] [Description("The command to run, including any arguments.")] [RemainingText]
         string command)
     {
-        if (Eval.RestrictedTerms.Any(command.Contains))
-        {
-            await ctx.RespondAsync("Sorry, denying this to be safe.");
-            return;
-        }
-        
         await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
 
         var cmdResponse = await ShellCommand(command);

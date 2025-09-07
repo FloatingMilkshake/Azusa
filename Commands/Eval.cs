@@ -2,8 +2,6 @@ namespace Azusa.Commands;
 
 public static class Eval
 {
-    internal static readonly List<string> RestrictedTerms = ["poweroff", "shutdown", "reboot", "halt", "id_ed25519", "ssh_key"];
-
     private static readonly string[] EvalImports =
     [
         "System", "System.Collections.Generic", "System.Linq",
@@ -18,12 +16,6 @@ public static class Eval
     [RequireApplicationOwner]
     public static async Task EvalCommand(TextCommandContext ctx, [Parameter("code")] [Description("The code to evaluate.")] [RemainingText] string code)
     {
-        if (RestrictedTerms.Any(code.Contains))
-        {
-            await ctx.RespondAsync("Sorry, denying this to be safe.");
-            return;
-        }
-        
         await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
 
         try
