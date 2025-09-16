@@ -4,6 +4,7 @@ public class MimeType
 {
     [Command("mimetype")]
     [Description("Check the mime type of a file online.")]
+    [AllowedProcessors(typeof(TextCommandProcessor))]
     [TextAlias("mime", "type")]
     public static async Task MimeTypeCommand(CommandContext ctx,
         [Parameter("file")]
