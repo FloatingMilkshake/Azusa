@@ -12,25 +12,31 @@ public static class Purge
         await ctx.Message.DeleteAsync();
         
         IReadOnlyList<DiscordMessage> msgs;
-        try
+        
+        if (startingMessageOrCount <= 100)
         {
-            if (startingMessageOrCount <= 2000)
-                msgs = await ctx.Channel.GetMessagesAsync(Convert.ToInt32(startingMessageOrCount)).ToListAsync();
-            else
-                msgs = await ctx.Channel.GetMessagesAfterAsync(startingMessageOrCount, int.MaxValue).ToListAsync();
+            msgs = await ctx.Channel.GetMessagesAsync(Convert.ToInt32(startingMessageOrCount)).ToListAsync();
         }
-        catch (Exception ex) when (ex is UnauthorizedException || ex.InnerException is UnauthorizedException)
+        else
         {
-            await ctx.RespondAsync("I can't read the start message!");
-            return;
-        }
-        catch (Exception ex)
-        {
-            var response = $"An unknown error occurred:\n```\n{ex.GetType()}: {ex.Message}\n{ex.StackTrace}\n```";
-            if (ex.InnerException is not null)
-                response += $"```\n{ex.InnerException.GetType()}: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}\n```";
-            await ctx.RespondAsync(response);
-            return;
+            try
+            {
+                var startingMessage = await ctx.Channel.GetMessageAsync(startingMessageOrCount);
+                msgs = await ctx.Channel.GetMessagesAfterAsync(startingMessage.Id, int.MaxValue).ToListAsync();
+            }
+            catch (Exception ex) when (ex is UnauthorizedException or NotFoundException || ex.InnerException is UnauthorizedException or NotFoundException)
+            {
+                await ctx.RespondAsync("You entered an invalid message ID, or asked me to delete too many messages (the limit is 100)! Try again.");
+                return;
+            }
+            catch (Exception ex)
+            {
+                var response = $"An unknown error occurred:\n```\n{ex.GetType()}: {ex.Message}\n{ex.StackTrace}\n```";
+                if (ex.InnerException is not null)
+                    response += $"```\n{ex.InnerException.GetType()}: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}\n```";
+                await ctx.RespondAsync(response);
+                return;
+            }
         }
 
         if (msgs.Count < 1)
