@@ -10,7 +10,7 @@ public static class Due
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
     public static async Task DueCommand(TextCommandContext ctx,
-        [Parameter("filter")] [Description("The date to filter to. Relative or absolute.")] [RemainingText] string filter)
+        [Parameter("filter")] [Description("The date to filter to. Relative or absolute. Defaults to 5 days.")] [RemainingText] string filter = "5d")
     {
         var now = DateTime.Now;
         var date = ParseFilter(filter);
