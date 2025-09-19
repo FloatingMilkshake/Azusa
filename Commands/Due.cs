@@ -207,7 +207,11 @@ public static class Due
             foreach (var item in courseItems)
             {
                 var dueDate = ((DateTime?)(item["plannable"]?["due_at"]));
-                var dueDateStr = dueDate.HasValue ? dueDate.Value.ToLocalTime().ToString("MM/dd @ hh:mmtt").ToLower() : "[error]";
+                var dueDateStr = dueDate.HasValue
+                    ? dueDate.Value.Year == DateTime.Now.Year
+                        ? dueDate.Value.ToLocalTime().ToString("MM/dd @ hh:mmtt").ToLower()
+                        : dueDate.Value.ToLocalTime().ToString("MM/dd/yy @ hh:mmtt").ToLower()
+                    : "[error]";
                 output += $"- **{StringHelpers.Truncate(item["plannable"]?["title"]?.ToString(), 30)}**, due {dueDateStr}\n";
             }
         }
