@@ -29,14 +29,11 @@ public class ConfigJson
 
 public class Canvas
 {
-    [JsonProperty("canvasDomain")]
-    public string CanvasDomain { get; set; }
-
-    [JsonProperty("cloudflareAccessClientId")]
-    public string CloudflareAccessClientId { get; set; }
-
-    [JsonProperty("cloudflareAccessClientSecret")]
-    public string CloudflareAccessClientSecret { get; set; }
+    [JsonProperty("apiToken")]
+    public string ApiToken { get; private set; }
+    
+    [JsonProperty("domain")]
+    public string Domain { get; private set; }
 }
 
 public class Err

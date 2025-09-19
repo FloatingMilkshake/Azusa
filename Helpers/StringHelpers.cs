@@ -73,4 +73,17 @@ public static class StringHelpers
         }
         return [];
     }
+    
+    public static string Truncate(string input, int maxLength)
+    {
+        if (input is null && maxLength <= 9)
+            return "[invalid]";
+        else if (input is null)
+            return "";
+        
+        if (input.Length < maxLength)
+            return input;
+        
+        return input[..maxLength] + "...";
+    }
 }
