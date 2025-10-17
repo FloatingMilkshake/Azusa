@@ -20,7 +20,6 @@ public static class MessageEvents
             return;
         
         var insiderUrlMatch = insiderUrlPattern.Match(e.Message.Content);
-        var windowsVersion = $"Windows {insiderUrlMatch.Groups[1].Value}";
         var buildNumber1 = insiderUrlMatch.Groups[2].Value;
         var buildNumber2 = insiderUrlMatch.Groups[3].Value;
         var channel1 = insiderUrlMatch.Groups[4].Value;
@@ -65,7 +64,7 @@ public static class MessageEvents
         
         var blogLink = insiderUrlMatch.ToString();
         
-        var command = $"/announcebuild windows_version:{windowsVersion} build_number:{buildNumber} blog_link:{blogLink} insider_role1:{channel1}";
+        var command = $"/announcebuild build_number:{buildNumber} blog_link:{blogLink} insider_role1:{channel1}";
         if (channel2 != string.Empty) command += $" insider_role2:{channel2}";
         
         // send command to channel
