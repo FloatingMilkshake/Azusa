@@ -6,6 +6,16 @@ public static class MessageEvents
 {
     public static async Task MessageCreated(DiscordClient client, MessageCreatedEventArgs e)
     {
+        #region MonitoRSS monitoring
+        
+        if (e.Channel.Id == 1408962751153569944 && e.Author.Id == 944784076735414342)
+        {
+            // Log time of latest message from MonitoRSS in feed channel
+            await Program.Redis.StringSetAsync("monitorssLastDelivery", JsonConvert.SerializeObject(DateTime.UtcNow));
+        }
+        
+        #endregion MonitoRSS monitoring
+        
         #region insider RSS feed parsing for /announcebuild
         
         // ignore self

@@ -9,6 +9,12 @@ public static class Program
     internal static DiscordClient Discord;
     internal static readonly HttpClient HttpClient = new();
     internal static MinioClient Minio;
+#if DEBUG
+    internal static readonly ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
+#else
+    internal static readonly ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("redis");
+#endif
+    public static readonly IDatabase Redis = redis.GetDatabase();
     // ReSharper enable InconsistentNaming
 #pragma warning restore CA2211 // Non-constant fields should not be visible
 
@@ -89,6 +95,10 @@ public static class Program
 
         // Connect
         await Discord.ConnectAsync();
+        
+        // Run RSS monitoring task
+        await Tasks.RssMonitoringTask.ExecuteAsync();
+        
         await Task.Delay(Timeout.InfiniteTimeSpan);
     }
 }
