@@ -5,6 +5,7 @@
 config.json
 .DS_Store
 .idea/
+redisdata/
 
 ### Csharp ###
 ## Ignore Visual Studio temporary files, build results, and
