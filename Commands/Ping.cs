@@ -13,7 +13,25 @@ public static class Ping
 
         var rtt = (msg?.Id - ctx.Message.Id) >> 22 ?? 0;
         var ping = ctx.Client.GetConnectionLatency(0).TotalMilliseconds;
-
-        await ctx.EditResponseAsync($"Pong! Latency `{ping}` RTT `{rtt}`");
+        
+        var dbPing = await CheckDatabaseLatencyAsync();
+        
+        await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
+            $"Pong!\n"
+            + $"Websocket `{ping}ms`\n"
+            + $"RTT `{rtt}ms`\n"
+            + $"Redis `{dbPing}ms`\n"));
+    }
+    
+    private static async Task<string> CheckDatabaseLatencyAsync()
+    {
+        try
+        {
+            return (await Program.Redis.PingAsync()).TotalMilliseconds.ToString();
+        }
+        catch
+        {
+            return "Unreachable!";
+        }
     }
 }
