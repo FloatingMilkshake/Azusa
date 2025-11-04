@@ -54,7 +54,7 @@ public class RssMonitoringTask
             // OK
             else
             {
-                Program.Discord.Logger.LogInformation("[OK] Good RSS delivery time");
+                Program.Discord.Logger.LogDebug("[OK] Good RSS delivery time");
             }
         }
         catch (Exception ex)
