@@ -9,9 +9,6 @@ public class Err
     {
         await ctx.RespondAsync("Working on it...");
         
-        // Shoot a wake on LAN packet to the Windows machine to ensure it is awake
-        await WakeUp.DoWakeup();
-        
         // Sanitize input
         code = code.Replace("\"", "").Replace(";", "").Replace("&", "").Replace("|", "").Replace("&&", "").Replace("||", "");
         
