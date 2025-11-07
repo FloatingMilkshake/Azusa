@@ -30,10 +30,10 @@ public static class MessageEvents
             return;
         
         var insiderUrlMatch = insiderUrlPattern.Match(e.Message.Content);
-        var buildNumber1 = insiderUrlMatch.Groups[2].Value;
-        var buildNumber2 = insiderUrlMatch.Groups[3].Value;
-        var channel1 = insiderUrlMatch.Groups[4].Value;
-        var channel2 = insiderUrlMatch.Groups[5].Value;
+        var buildNumber1 = insiderUrlMatch.Groups[1].Value;
+        var buildNumber2 = insiderUrlMatch.Groups[2].Value;
+        var channel1 = insiderUrlMatch.Groups[3].Value;
+        var channel2 = insiderUrlMatch.Groups[4].Value;
         
         // format channel names correctly
         // canary -> Canary Channel
