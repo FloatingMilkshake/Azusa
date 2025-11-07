@@ -14,7 +14,14 @@ public class Shell
         [Parameter("command")] [Description("The command to run, including any arguments.")] [RemainingText]
         string command)
     {
-        await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
+        try
+        {
+            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
+        }
+        catch
+        {
+            await ctx.RespondAsync("Running...");
+        }
 
         var cmdResponse = await ShellCommand(command);
         
@@ -24,7 +31,14 @@ public class Shell
         }
         catch
         {
-            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
+            try
+            {
+                await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
+            }
+            catch
+            {
+                await ctx.RespondAsync("Failed");
+            }
             return;
         }
         

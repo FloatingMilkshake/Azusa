@@ -16,7 +16,14 @@ public static class Eval
     [RequireApplicationOwner]
     public static async Task EvalCommand(TextCommandContext ctx, [Parameter("code")] [Description("The code to evaluate.")] [RemainingText] string code)
     {
-        await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
+        try
+        {
+            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
+        }
+        catch
+        {
+            await ctx.RespondAsync("Running...");
+        }
 
         try
         {
@@ -56,7 +63,14 @@ public static class Eval
             }
             catch
             {
-                await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
+                try
+                {
+                    await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
+                }
+                catch
+                {
+                    await ctx.RespondAsync("Failed");
+                }
                 return;
             }
         }
