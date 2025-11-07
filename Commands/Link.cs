@@ -132,7 +132,7 @@ public static class Link
         if (ctx.Channel.Id != 1409317970844319815)
         {
             var msgBefore = await ctx.Channel.GetMessagesBeforeAsync(ctx.Message.Id, 2).FirstOrDefaultAsync();
-            if (msgBefore is not null && msgBefore.Author.Id == 455432936339144705 && msgBefore.Content != "yes")
+            if (msgBefore is not null && !(msgBefore.Author.Id == 455432936339144705 && msgBefore.Content == "yes"))
             {
                 await ctx.RespondAsync("you sure? ~> <#1409317970844319815>");
                 return;
@@ -168,6 +168,8 @@ public static class Link
 
             valueRequest.Headers.Add("X-Auth-Key", Program.ConfigJson.WorkerLinks.ApiKey);
             valueRequest.Headers.Add("X-Auth-Email", Program.ConfigJson.WorkerLinks.Email);
+            
+            Program.Discord.Logger.LogDebug("link list: Sending request to {requestUri}", valueRequestUri);
             var valueResponse = await Program.HttpClient.SendAsync(valueRequest);
 
             var value = await valueResponse.Content.ReadAsStringAsync();
@@ -206,7 +208,7 @@ public static class Link
             var stop = new DiscordButtonComponent(DiscordButtonStyle.Danger, "stop", "Stop");
 
             if (pages.Count > 1)
-                await ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages,
+                ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages,
                     new PaginationButtons
                         { SkipLeft = leftSkip, Left = left, Right = right, SkipRight = rightSkip, Stop = stop },
                     deletion: ButtonPaginationBehavior.Disable);
