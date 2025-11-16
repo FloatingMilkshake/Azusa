@@ -11,7 +11,7 @@ public static class MessageEvents
         if (e.Channel.Id == 1408962751153569944 && e.Author.Id == 944784076735414342)
         {
             // Log time of latest message from MonitoRSS in feed channel
-            await Program.Redis.StringSetAsync("monitorssLastDelivery", JsonConvert.SerializeObject(DateTime.UtcNow));
+            await Program.Redis.StringSetAsync("monitorssLastDelivery", $"{JsonConvert.SerializeObject(DateTime.UtcNow)}@{e.Message.JumpLink}");
         }
         
         #endregion MonitoRSS monitoring

@@ -17,8 +17,10 @@ public class RssCheck
         
         try
         {
-            var lastDeliveryTime = JsonConvert.DeserializeObject<DateTime>(storedLastDelivery);
-            await ctx.RespondAsync($"{lastDeliveryTime:o}; {lastDeliveryTime.Humanize()}");
+            var split = storedLastDelivery.ToString().Split("@");
+            var lastDeliveryTime = JsonConvert.DeserializeObject<DateTime>(split.First());
+            var msgLink = split.First() == split.Last() ? "" : $": {split.Last()}";
+            await ctx.RespondAsync($"{lastDeliveryTime:o}; {lastDeliveryTime.Humanize()}{msgLink}");
         }
         catch
         {
