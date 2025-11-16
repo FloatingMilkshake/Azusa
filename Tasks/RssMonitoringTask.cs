@@ -33,7 +33,7 @@ public class RssMonitoringTask
                 lastDeliveryTimeString = JsonConvert.SerializeObject(now);
                 await Program.Redis.StringSetAsync("monitorssLastDelivery", JsonConvert.SerializeObject(now));
             }
-            var lastDeliveryTime = JsonConvert.DeserializeObject<DateTime>(lastDeliveryTimeString);
+            var lastDeliveryTime = JsonConvert.DeserializeObject<DateTime>(lastDeliveryTimeString.ToString().Split("@").First());
             
             // FIRING
             if (lastDeliveryTime < DateTime.UtcNow.AddHours(-24))
