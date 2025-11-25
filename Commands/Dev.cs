@@ -65,10 +65,17 @@ public static class Dev
         else if (devModeEnabled is "check")
         {
             var enabled = await (await Program.HttpClient.GetAsync("https://haste.floatingmilkshake.com/raw/azusaDevModeEnabled")).Content.ReadAsStringAsync() == "true";
+            string response;
             if (enabled)
-                await ctx.RespondAsync("Dev mode is enabled!");
+                response = "Dev mode is enabled!";
             else
-                await ctx.RespondAsync("Dev mode is disabled!");
+                response = "Dev mode is disabled!";
+#if DEBUG
+            response += " This is dev!";
+#else
+            response += " This is prod!";
+#endif
+            await ctx.RespondAsync(response);
         }
         else
         {
