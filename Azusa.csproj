@@ -8,9 +8,9 @@
 
     <ItemGroup>
         <PackageReference Include="Abyssal.HumanDateParser" Version="2.0.0-20191113.1" />
-        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02552" />
-        <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02552" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02552" />
+        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02559" />
+        <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02559" />
+        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02559" />
         <PackageReference Include="Humanizer.Core" Version="2.14.1" />
         <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.12.0"/>
         <PackageReference Include="MimeTypeMapOfficial" Version="1.0.17"/>
