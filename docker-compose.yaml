@@ -28,7 +28,7 @@
     command: --appendonly yes
     labels: [ "com.centurylinklabs.watchtower.scope=azusa" ]
   watchtower:
-    image: containrrr/watchtower
+    image: nickfedor/watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/config.json:/config.json
