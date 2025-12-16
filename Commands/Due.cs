@@ -134,8 +134,6 @@ public static class Due
         //  ^^^^^^^^^^^^
         
         var linkHeader = response.Headers.FirstOrDefault(x => x.Key.ToLower() == "link");
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
-        // ReSharper disable once HeuristicUnreachableCode
         if (linkHeader.Value is null)
             return string.Empty;
         var linkHeaderValue = linkHeader.Value.FirstOrDefault();

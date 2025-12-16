@@ -13,7 +13,6 @@ public static class MessageEvents
         await DoTodoCountAsync(client, e);
     }
 
-    // ReSharper disable once InconsistentNaming
     private static async Task DoMonitoRSSCheckAsync(DiscordClient _, MessageCreatedEventArgs e)
     {
         if (e.Channel.Id == 1408962751153569944 && e.Author.Id == 944784076735414342)
@@ -85,7 +84,6 @@ public static class MessageEvents
         if (channel2 != string.Empty) command += $" insider_role2:{channel2}";
 
         // send command to channel
-        // ReSharper disable once PossibleNullReferenceException; channel cannot be null
         var msg = await e.Message.Channel.SendMessageAsync(command);
 
         // suppress embed
@@ -100,7 +98,6 @@ public static class MessageEvents
 
     private static async Task DoTodoCountAsync(DiscordClient _, MessageCreatedEventArgs e)
     {
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
         if (e.Message.Channel.Guild is not null
             && e.Message.Channel.Guild.Id == 799644062973427743
             && e.Message.Channel.Name.StartsWith("todo")

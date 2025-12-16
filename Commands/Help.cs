@@ -168,7 +168,6 @@ public static class Help
 
             if (check is RequireApplicationOwnerAttribute requireApplicationOwnerAttribute)
                 // null-forgiving here is fine because im the only one using this bot & its not in a team
-                // ReSharper disable once SimplifyLinqExpressionUseAll
                 if (!Program.Discord.CurrentApplication.Owners!.Any(x => x.Id == ctx.User.Id))
                     failedChecks.Add(requireApplicationOwnerAttribute);
         }

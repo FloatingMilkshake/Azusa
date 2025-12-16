@@ -3,7 +3,6 @@
 public static class Program
 {
 #pragma warning disable CA2211 // Non-constant fields should not be visible
-    // ReSharper disable InconsistentNaming
     internal static EventId BotEventId { get; } = new(1000, "Azusa");
     internal static ConfigJson ConfigJson;
     internal static DiscordClient Discord;
@@ -15,7 +14,6 @@ public static class Program
     internal static readonly ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("redis");
 #endif
     public static readonly IDatabase Redis = redis.GetDatabase();
-    // ReSharper enable InconsistentNaming
 #pragma warning restore CA2211 // Non-constant fields should not be visible
 
     internal static async Task Main()
@@ -33,7 +31,6 @@ public static class Program
         if (ConfigJson is null)
         {
             Discord.Logger.LogCritical(
-                // ReSharper disable once LogMessageIsSentenceProblem
                 "config.json is malformed. Please be sure it has all of the required values.");
             Environment.Exit(1);
         }

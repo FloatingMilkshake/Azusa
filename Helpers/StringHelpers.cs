@@ -2,7 +2,6 @@ namespace Azusa.Helpers;
 
 public static class StringHelpers
 {
-    // ReSharper disable once UnusedMethodReturnValue.Global
     public static async Task<List<string>> SplitStringAsync(string input, bool respond = false, int maxLength = 1980, CommandContext ctx = null, string completionMessage = null)
     {
         List<string> split = [];

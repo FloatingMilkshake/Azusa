@@ -201,7 +201,6 @@ public static partial class Cdn
     // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/3335c38/src/Modules/Owner.cs#L313)
     private readonly struct CloudflareContent(List<string> urls)
     {
-        // ReSharper disable once UnusedMember.Local
         public List<string> Files { get; } = urls;
     }
 }
