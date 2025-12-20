@@ -9,8 +9,6 @@ public static class MessageEvents
         await DoMonitoRSSCheckAsync(client, e);
 
         await ParseWindowsInsidersRssAsync(client, e);
-
-        await DoTodoCountAsync(client, e);
     }
 
     private static async Task DoMonitoRSSCheckAsync(DiscordClient _, MessageCreatedEventArgs e)
@@ -94,31 +92,5 @@ public static class MessageEvents
                 (x.Description?.Contains("please note", StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (x.Description?.Contains("note:", StringComparison.OrdinalIgnoreCase) ?? false)))
             await msg.CreateReactionAsync(DiscordEmoji.FromName(client, ":bangbang:"));
-    }
-
-    private static async Task DoTodoCountAsync(DiscordClient _, MessageCreatedEventArgs e)
-    {
-        if (e.Message.Channel.Guild is not null
-            && e.Message.Channel.Guild.Id == 799644062973427743
-            && e.Message.Channel.Name.StartsWith("todo")
-            && e.Message.Channel.Name.Length <= 7)
-        {
-            var numTodoItems = 0;
-            var messages = await e.Message.Channel.GetMessagesAsync().ToListAsync();
-            foreach (var message in messages)
-            {
-                if (message.Author.Id == 455432936339144705 &&
-                    (message.Content.StartsWith("[ ]") || message.Content.StartsWith("- ")))
-                {
-                    numTodoItems++;
-                }
-            }
-
-            await e.Message.Channel.ModifyAsync(x =>
-            {
-                x.Name = $"todo-{numTodoItems}";
-                x.AuditLogReason = "Updating number of todo items.";
-            });
-        }
     }
 }
