@@ -1,5 +1,3 @@
-using DSharpPlus.EventArgs;
-
 namespace Azusa.Events;
 
 public static class MessageEvents
@@ -9,6 +7,8 @@ public static class MessageEvents
         await DoMonitoRSSCheckAsync(client, e);
 
         await ParseWindowsInsidersRssAsync(client, e);
+
+        await CheckRssFeedArticlesForUpdatesAsync(client, e);
     }
 
     private static async Task DoMonitoRSSCheckAsync(DiscordClient _, MessageCreatedEventArgs e)
@@ -92,5 +92,33 @@ public static class MessageEvents
                 (x.Description?.Contains("please note", StringComparison.OrdinalIgnoreCase) ?? false) ||
                 (x.Description?.Contains("note:", StringComparison.OrdinalIgnoreCase) ?? false)))
             await msg.CreateReactionAsync(DiscordEmoji.FromName(client, ":bangbang:"));
+    }
+
+    private static async Task CheckRssFeedArticlesForUpdatesAsync(DiscordClient client, MessageCreatedEventArgs e)
+    {
+        List<string> matches = [
+            "node_exporter",
+            "forgejo",
+            "timvisee/send",
+            "kotx/aster",
+            "tubearchivist",
+            "jellyfin",
+            "worker-links",
+            "monitorss",
+            "discord-oidc-worker",
+            "uptime-kuma",
+            "Erisa/starbin",
+            "cloudflared",
+	        "immich"
+        ];
+
+        // MonitoRSS only
+        if (e.Message.Author.Id != 944784076735414342) return;
+
+        if (matches.Any(m => e.Message.Content.Contains(m, StringComparison.OrdinalIgnoreCase)))
+        {
+            await Task.Delay(5000); // give the message a bit to load embeds
+            await e.Message.ForwardAsync(1409187775005331566);
+        }
     }
 }

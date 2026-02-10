@@ -9,6 +9,7 @@ global using DSharpPlus.Commands.Processors.TextCommands;
 global using DSharpPlus.Commands.Processors.TextCommands.Parsing;
 global using DSharpPlus.Commands.Trees.Metadata;
 global using DSharpPlus.Entities;
+global using DSharpPlus.EventArgs;
 global using DSharpPlus.Exceptions;
 global using DSharpPlus.Interactivity;
 global using DSharpPlus.Interactivity.Enums;
