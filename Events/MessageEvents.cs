@@ -29,8 +29,8 @@ public static class MessageEvents
         // try to match content with Insider URL pattern
         var insiderUrlPattern = RegularExpressions.InsiderUrlPattern();
 
-        // ignore non-matching messages or messages that are not from RSS articles
-        if (!insiderUrlPattern.IsMatch(e.Message.Content) || !e.Message.Content.Contains("📰"))
+        // ignore non-matching messages or messages that are not from MonitoRSS
+        if (!insiderUrlPattern.IsMatch(e.Message.Content) || e.Message.Author.Id != 944784076735414342)
             return;
 
         var insiderUrlMatch = insiderUrlPattern.Match(e.Message.Content);
