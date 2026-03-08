@@ -109,7 +109,8 @@ public static class MessageEvents
             "uptime-kuma",
             "Erisa/starbin",
             "cloudflared",
-	        "immich"
+	        "immich",
+            "pocket-id"
         ];
 
         // MonitoRSS only
