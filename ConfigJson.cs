@@ -16,9 +16,6 @@ public class ConfigJson
 
     [JsonProperty("workerLinks")]
     public WorkerLinks WorkerLinks { get; set; }
-    
-    [JsonProperty("uptimeKumaServiceToken")]
-    public UptimeKumaServiceToken UptimeKumaServiceToken { get; set; }
 }
 
 public class Canvas
@@ -94,13 +91,4 @@ public class WorkerLinks
 
     [JsonProperty("secret")]
     public string Secret { get; set; }
-}
-
-public class UptimeKumaServiceToken
-{
-    [JsonProperty("clientId")]
-    public string ClientId { get; set; }
-    
-    [JsonProperty("clientSecret")]
-    public string ClientSecret { get; set; }
 }

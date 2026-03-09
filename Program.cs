@@ -97,9 +97,6 @@ public static class Program
         // Connect
         await Discord.ConnectAsync();
         
-        // Run RSS monitoring task
-        await Tasks.RssMonitoringTask.ExecuteAsync();
-        
         await Task.Delay(Timeout.InfiniteTimeSpan);
     }
 }
