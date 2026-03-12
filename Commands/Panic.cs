@@ -14,9 +14,9 @@ public class Panic
         }
 
         var lastPanic = JsonConvert.DeserializeObject<DateTime?>((await Program.Redis.StringGetAsync("lastPanic")).ToString() ?? "");
-        if (lastPanic is not null && lastPanic > DateTime.UtcNow.AddMinutes(-2))
+        if (lastPanic is not null && lastPanic > DateTime.UtcNow.AddMinutes(-5))
         {
-            await ctx.RespondAsync("Sorry, but this can only be used once every 2 minutes.");
+            await ctx.RespondAsync("Sorry, but this can only be used once every 5 minutes.");
             return;
         }
 
