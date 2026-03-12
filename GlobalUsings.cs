@@ -21,6 +21,7 @@ global using Microsoft.CodeAnalysis.Scripting;
 global using Microsoft.Extensions.Logging;
 global using MimeTypes;
 global using Minio;
+global using Minio.DataModel.Args;
 global using Minio.Exceptions;
 global using Newtonsoft.Json;
 global using Newtonsoft.Json.Linq;

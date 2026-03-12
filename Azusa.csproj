@@ -2,23 +2,21 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <InvariantGlobalization>false</InvariantGlobalization>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Abyssal.HumanDateParser" Version="2.0.0-20191113.1" />
-        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02573" />
-        <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02573" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02573" />
-        <PackageReference Include="Humanizer.Core" Version="2.14.1" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="4.12.0" />
+        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02575" />
+        <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02575" />
+        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02575" />
+        <PackageReference Include="Humanizer.Core" Version="3.0.10" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="5.3.0" />
         <PackageReference Include="MimeTypeMapOfficial" Version="1.0.17" />
-        <PackageReference Include="Minio" Version="4.0.5" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="StackExchange.Redis" Version="2.9.32" />
-        <PackageReference Include="System.Linq" Version="4.3.0" />
-        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="Minio" Version="7.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.5-beta1" />
+        <PackageReference Include="StackExchange.Redis" Version="2.11.8" />
     </ItemGroup>
 
     <ItemGroup>
