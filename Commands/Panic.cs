@@ -20,8 +20,14 @@ public class Panic
             return;
         }
 
-        if ((ctx.User.Id == 455432936339144705 || ctx.User.Id == 208935109485789184) && who == "cf")
+        if (who == "cf")
         {
+            if (ctx.User.Id != 455432936339144705 && ctx.User.Id != 208935109485789184)
+            {
+                await ctx.RespondAsync("Sorry, you can't do that.");
+                return;
+            }
+
             var request = new HttpRequestMessage(HttpMethod.Post, "https://ntfy.sh/mistralton_pager_alerts");
             request.Headers.Add("Title", "Please check Discord ASAP");
             request.Headers.Add("Priority", "urgent");
