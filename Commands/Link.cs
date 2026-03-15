@@ -27,14 +27,9 @@ public static class Link
             return;
         }
 
-        var baseUrl = Program.ConfigJson.WorkerLinks.BaseUrl;
-
-        using HttpClient httpClient = new();
-        httpClient.BaseAddress = new Uri(baseUrl);
-
         var request = key is "null" or "random" or "rand"
-            ? new HttpRequestMessage(HttpMethod.Post, "")
-            : new HttpRequestMessage(HttpMethod.Put, key);
+            ? new HttpRequestMessage(HttpMethod.Post, Program.ConfigJson.WorkerLinks.BaseUrl)
+            : new HttpRequestMessage(HttpMethod.Put, $"{Program.ConfigJson.WorkerLinks.BaseUrl}/{key}");
 
         if (Program.ConfigJson.WorkerLinks.Secret is null)
         {
@@ -50,7 +45,7 @@ public static class Link
         HttpResponseMessage response;
         try
         {
-            response = await httpClient.SendAsync(request);
+            response = await Program.HttpClient.SendAsync(request);
         }
         catch (Exception ex)
         {
