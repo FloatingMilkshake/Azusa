@@ -18,6 +18,8 @@ public static class Program
 
     internal static async Task Main()
     {
+        HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Azusa (contact https://floatingmilkshake.com)");
+
         // Read config.json
         string json;
         await using (var fs = File.OpenRead("config.json"))
