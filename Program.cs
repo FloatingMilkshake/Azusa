@@ -6,7 +6,7 @@ public static class Program
     internal static EventId BotEventId { get; } = new(1000, "Azusa");
     internal static ConfigJson ConfigJson;
     internal static DiscordClient Discord;
-    internal static readonly HttpClient HttpClient = new();
+    public static readonly HttpClient HttpClient = new();
     internal static IMinioClient Minio;
 #if DEBUG
     internal static readonly ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
