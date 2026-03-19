@@ -25,22 +25,7 @@ public class Shell
 
         var cmdResponse = await ShellCommand(command);
         
-        try
-        {
-            await StringHelpers.SplitStringAsync($"```\n{cmdResponse.Output}\n{cmdResponse.Error}\n```", true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
-        }
-        catch
-        {
-            try
-            {
-                await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
-            }
-            catch
-            {
-                await ctx.RespondAsync("Failed");
-            }
-            return;
-        }
+        await StringHelpers.SplitStringAsync($"```\n{cmdResponse.Output}\n{cmdResponse.Error}\n```", true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
         
         await ctx.Message.DeleteReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"), ctx.Client.CurrentUser);
     }
