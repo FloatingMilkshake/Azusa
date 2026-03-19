@@ -55,7 +55,7 @@ public class Shell
         if (osDescription.Contains("Windows"))
         {
             fileName = @"C:\Program Files\PowerShell\7\pwsh.exe";
-            args = $"-Command \"{escapedArgs} 2>&1\"";
+            args = $"-Command \"$PSStyle.OutputRendering = [System.Management.Automation.OutputRendering]::PlainText ; {escapedArgs} 2>&1\"";
         }
         else
         {
