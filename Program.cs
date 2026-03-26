@@ -58,7 +58,7 @@ public static class Program
         clientBuilder.UseInteractivity(new InteractivityConfiguration
         {
             PollBehaviour = PollBehaviour.KeepEmojis,
-            Timeout = TimeSpan.FromSeconds(30)
+            Timeout = TimeSpan.FromSeconds(300)
         });
         clientBuilder.ConfigureEventHandlers((builder) =>
         {
