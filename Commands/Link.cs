@@ -188,12 +188,10 @@ public static class Link
             var stop = new DiscordButtonComponent(DiscordButtonStyle.Danger, "stop", "Stop");
 
             if (pages.Count > 1)
-#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages,
-#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                await ctx.Channel.SendPaginatedMessageAsync(ctx.User, pages,
                     new PaginationButtons
                         { SkipLeft = leftSkip, Left = left, Right = right, SkipRight = rightSkip, Stop = stop },
-                    deletion: ButtonPaginationBehavior.Disable);
+                    deletion: ButtonPaginationBehavior.DeleteMessage);
             else
                 await ctx.Channel.SendMessageAsync(embed.WithDescription(kvListResponse));
         }
