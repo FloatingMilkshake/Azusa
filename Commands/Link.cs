@@ -75,10 +75,6 @@ public static class Link
         if (url[0] == '/') url = url[1..];
 
         var baseUrl = Program.ConfigJson.WorkerLinks.BaseUrl;
-
-        using HttpClient httpClient = new();
-        httpClient.BaseAddress = new Uri(baseUrl);
-
         if (!url.Contains(baseUrl)) url = $"{baseUrl}/{url}";
 
         if (Program.ConfigJson.WorkerLinks.Secret is null)
@@ -95,7 +91,7 @@ public static class Link
         HttpResponseMessage response;
         try
         {
-            response = await httpClient.SendAsync(request);
+            response = await Program.HttpClient.SendAsync(request);
         }
         catch (Exception ex)
         {
