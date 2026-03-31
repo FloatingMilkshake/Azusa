@@ -8,9 +8,6 @@ public class ConfigJson
     [JsonProperty("canvas")]
     public Canvas Canvas { get; set; }
 
-    [JsonProperty("hastebin")]
-    public Hastebin Hastebin { get; set; }
-
     [JsonProperty("s3")]
     public S3 S3 { get; set; }
 
@@ -25,21 +22,6 @@ public class Canvas
     
     [JsonProperty("domain")]
     public string Domain { get; private set; }
-}
-
-public class Hastebin
-{
-    [JsonProperty("accountId")]
-    public string AccountId { get; set; }
-
-    [JsonProperty("namespaceId")]
-    public string NamespaceId { get; set; }
-
-    [JsonProperty("token")]
-    public string Token { get; set; }
-
-    [JsonProperty("url")]
-    public string Url { get; set; }
 }
 
 public class S3
