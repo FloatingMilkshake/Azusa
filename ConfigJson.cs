@@ -11,8 +11,8 @@ public class ConfigJson
     [JsonProperty("s3")]
     public S3 S3 { get; set; }
 
-    [JsonProperty("workerLinks")]
-    public WorkerLinks WorkerLinks { get; set; }
+    [JsonProperty("shortLinks")]
+    public ShortLinks ShortLinks { get; set; }
 }
 
 public class Canvas
@@ -54,22 +54,10 @@ public class S3
     public string ZoneId { get; set; }
 }
 
-public class WorkerLinks
+public class ShortLinks
 {
-    [JsonProperty("accountId")]
-    public string AccountId { get; set; }
-
-    [JsonProperty("apiKey")]
-    public string ApiKey { get; set; }
-
     [JsonProperty("baseUrl")]
     public string BaseUrl { get; set; }
-
-    [JsonProperty("email")]
-    public string Email { get; set; }
-
-    [JsonProperty("namespaceId")]
-    public string NamespaceId { get; set; }
 
     [JsonProperty("secret")]
     public string Secret { get; set; }
