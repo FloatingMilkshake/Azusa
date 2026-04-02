@@ -59,7 +59,7 @@ public static class Link
 
         if (url.Contains('>')) url = url.Replace(">", "");
 
-        if (key[0] == '/') key = key[1..];
+        if (key[0] == '/' && key.Length > 1) key = key[1..];
 
         if (Program.ConfigJson.ShortLinks.BaseUrl is null)
         {
