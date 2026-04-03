@@ -88,18 +88,13 @@ public static class MessageEvents
         List<string> matches = [
             "node_exporter",
             "forgejo",
-            "timvisee/send",
-            "kotx/aster",
             "tubearchivist",
             "jellyfin",
-            "worker-links",
             "monitorss",
-            "discord-oidc-worker",
             "uptime-kuma",
-            "Erisa/starbin",
-            "cloudflared",
 	        "immich",
-            "pocket-id"
+            "pocket-id",
+            "pi-hole"
         ];
 
         // MonitoRSS only
