@@ -12,9 +12,10 @@ namespace Azusa.Events
                     {
                         if (!Cancellations.ContainsKey(e.Message.Id))
                         {
-                            await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource,
-                                new DiscordInteractionResponseBuilder().WithContent(
-                                    "Unknown task! I can't cancel this, sorry. Are you sure it's still running?").AsEphemeral());
+                            await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent("Working on it...")
+                            .AddActionRowComponent(new DiscordActionRowComponent(
+                                [new DiscordButtonComponent(DiscordButtonStyle.Danger, "eval-cancel-button", "Failed to Cancel", true)]
+                            )));
                             return;
                         }
 
