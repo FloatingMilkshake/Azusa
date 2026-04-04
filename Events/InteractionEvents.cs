@@ -28,6 +28,11 @@ namespace Azusa.Events
 
                         await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.DeferredMessageUpdate);
 
+                        await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent("Working on it...")
+                            .AddActionRowComponent(new DiscordActionRowComponent(
+                                [new DiscordButtonComponent(DiscordButtonStyle.Danger, "eval-cancel-button", "Cancelling...", true)]
+                            )));
+
                         Cancellations[e.Message.Id].Cancel();
 
                         break;
