@@ -1,3 +1,5 @@
+using static Azusa.Commands.Eval;
+
 namespace Azusa.Commands;
 
 public class Shell
@@ -14,23 +16,37 @@ public class Shell
         [Parameter("command")] [Description("The command to run, including any arguments.")] [RemainingText]
         string command)
     {
-        try
+        await ctx.RespondAsync(new DiscordMessageBuilder().WithContent("Working on it...")
+            .AddActionRowComponent(new DiscordActionRowComponent(
+                [new DiscordButtonComponent(DiscordButtonStyle.Danger, "eval-cancel-button", "Cancel")]
+            ))
+        );
+
+        var msg = await ctx.GetResponseAsync();
+        Cancellations.Add(msg.Id, new CancellationTokenSource());
+        var cancellationToken = Cancellations[msg.Id].Token;
+
+        var cmdResponse = await ShellCommand(command, cancellationToken);
+
+        if (cancellationToken.IsCancellationRequested)
         {
-            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
-        }
-        catch
-        {
-            await ctx.RespondAsync("Running...");
+            await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("The operation was cancelled."));
+            Cancellations.Remove(msg.Id);
+            return;
         }
 
-        var cmdResponse = await ShellCommand(command);
-        
-        await StringHelpers.SplitStringAsync($"```\n{cmdResponse.Output}\n{cmdResponse.Error}\n```", true, ctx: ctx, completionMessage: $"\nFinished with exit code `{cmdResponse.ExitCode}`.");   
-        
-        await ctx.Message.DeleteReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"), ctx.Client.CurrentUser);
+        var splitOutput = await StringHelpers.SplitStringAsync($"```\n{cmdResponse.Output}\n{cmdResponse.Error}\n```");
+
+        foreach (var part in splitOutput)
+        {
+            await ctx.Channel.SendMessageAsync(part);
+        }
+        await msg.ModifyAsync(new DiscordMessageBuilder().WithContent($"\nFinished with exit code `{cmdResponse.ExitCode}`."));
+
+        Cancellations.Remove(msg.Id);
     }
 
-    public static async Task<ShellCommandResponse> ShellCommand(string command)
+    public static async Task<ShellCommandResponse> ShellCommand(string command, CancellationToken cancellationToken)
     {
         var osDescription = RuntimeInformation.OSDescription;
         string fileName;
@@ -65,9 +81,21 @@ public class Shell
         };
 
         proc.Start();
-        var result = await proc.StandardOutput.ReadToEndAsync();
-        var error = await proc.StandardError.ReadToEndAsync();
-        await proc.WaitForExitAsync();
+        string result;
+        string error;
+        try
+        {
+            result = await proc.StandardOutput.ReadToEndAsync(cancellationToken);
+            error = await proc.StandardOutput.ReadToEndAsync(cancellationToken);
+            await proc.WaitForExitAsync(cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            result = "The operation was cancelled.";
+            error = "";
+        }
+        if (cancellationToken.IsCancellationRequested)
+            proc.Kill();
 
         return new ShellCommandResponse(proc.ExitCode, result, error);
     }

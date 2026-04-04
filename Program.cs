@@ -63,6 +63,7 @@ public static class Program
         clientBuilder.ConfigureEventHandlers((builder) =>
         {
             builder.HandleMessageCreated(MessageEvents.MessageCreated);
+            builder.HandleComponentInteractionCreated(InteractionEvents.ComponentInteractionCreated);
         });
         clientBuilder.UseCommands((_, extension) =>
         {

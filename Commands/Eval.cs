@@ -2,7 +2,7 @@ namespace Azusa.Commands;
 
 public static class Eval
 {
-    private static readonly string[] EvalImports =
+    public static readonly string[] EvalImports =
     [
         "System", "System.Collections.Generic", "System.Linq",
         "System.Text", "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.Commands",
@@ -10,78 +10,82 @@ public static class Eval
         Assembly.GetExecutingAssembly().GetName().Name
     ];
 
+    public static readonly Dictionary<ulong, CancellationTokenSource> Cancellations = new();
+
     [Command("eval")]
     [Description("Evaluate C# code.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
     public static async Task EvalCommand(TextCommandContext ctx, [Parameter("code")] [Description("The code to evaluate.")] [RemainingText] string code)
     {
-        try
-        {
-            await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"));
-        }
-        catch
-        {
-            await ctx.RespondAsync("Running...");
-        }
+        CancellationToken cancellationToken = default;
+
+        var builder = new DiscordMessageBuilder().WithContent("Working on it...");
+
+        await ctx.RespondAsync(builder);
+        var msg = await ctx.GetResponseAsync();
 
         try
         {
-            Globals globals = new(Program.Discord, ctx);
-
             var scriptOptions = ScriptOptions.Default;
             scriptOptions = scriptOptions.WithImports(EvalImports);
             scriptOptions = scriptOptions.WithReferences(AppDomain.CurrentDomain.GetAssemblies()
                 .Where(xa => !xa.IsDynamic && !string.IsNullOrWhiteSpace(xa.Location)));
 
             var script = CSharpScript.Create(code, scriptOptions, typeof(Globals));
-            script.Compile();
-            var result = await script.RunAsync(globals).ConfigureAwait(false);
+
+            // Only offer the option to cancel if the code being evaluated supports it.
+            if (code.Contains("CToken"))
+            {
+                builder.AddActionRowComponent(new DiscordActionRowComponent(
+                    [new DiscordButtonComponent(DiscordButtonStyle.Danger, "eval-cancel-button", "Cancel")]
+                ));
+
+                Cancellations.Add(msg.Id, new CancellationTokenSource());
+                cancellationToken = Cancellations[msg.Id].Token;
+
+                await msg.ModifyAsync(builder);
+            }
+
+            var result = await script.RunAsync(new Globals(Program.Discord, ctx, cancellationToken), cancellationToken).ConfigureAwait(false);
 
             if (result?.ReturnValue is null)
             {
-                await ctx.RespondAsync("null");
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("null"));
             }
             else
             {
                 if (string.IsNullOrWhiteSpace(result.ReturnValue.ToString()))
                 {
                     // Isn't null, so it has to be whitespace
-                    await ctx.RespondAsync($"\"{result.ReturnValue}\"");
-
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithContent($"\"{result.ReturnValue}\""));
                     return;
                 }
 
-                await StringHelpers.SplitStringAsync(result.ReturnValue.ToString(), true, ctx: ctx);
+                var splitOutput = await StringHelpers.SplitStringAsync(result.ReturnValue.ToString());
+
+                foreach (var part in splitOutput)
+                {
+                    await ctx.Channel.SendMessageAsync(part);
+                }
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("Done!"));
             }
         }
         catch (Exception e)
         {
-            try
-            {
-                await ctx.RespondAsync(e.GetType() + ": " + e.Message);
-            }
-            catch
-            {
-                try
-                {
-                    await ctx.Message.CreateReactionAsync(DiscordEmoji.FromName(ctx.Client, ":x:"));
-                }
-                catch
-                {
-                    await ctx.RespondAsync("Failed");
-                }
-                return;
-            }
+            if (cancellationToken.IsCancellationRequested)
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("The operation was cancelled."));
+            else
+                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent(e.GetType() + ": " + e.Message));
         }
-        
-        await ctx.Message.DeleteReactionAsync(DiscordEmoji.FromName(ctx.Client, ":hourglass:"), ctx.Client.CurrentUser);
+
+        Cancellations.Remove(msg.Id);
     }
 }
 
 public class Globals
 {
-    public Globals(DiscordClient client, TextCommandContext ctx)
+    public Globals(DiscordClient client, TextCommandContext ctx, CancellationToken cancellationToken)
     {
         Context = ctx;
         Client = client;
@@ -90,6 +94,7 @@ public class Globals
         Guild = ctx.Guild;
         User = ctx.User;
         if (Guild is not null) Member = Guild.GetMemberAsync(User.Id).ConfigureAwait(false).GetAwaiter().GetResult();
+        CToken = cancellationToken;
     }
 
     public DiscordClient Client { get; set; }
@@ -99,4 +104,5 @@ public class Globals
     public DiscordUser User { get; set; }
     public DiscordMember Member { get; set; }
     public TextCommandContext Context { get; set; }
+    public CancellationToken CToken { get; set; }
 }
