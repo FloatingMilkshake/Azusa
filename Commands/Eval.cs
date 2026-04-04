@@ -68,7 +68,11 @@ public static class Eval
                 {
                     await ctx.Channel.SendMessageAsync(part);
                 }
-                await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("Done!"));
+
+                if (cancellationToken.IsCancellationRequested)
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("The operation was cancelled."));
+                else
+                    await msg.ModifyAsync(new DiscordMessageBuilder().WithContent("Done!"));
             }
         }
         catch (Exception e)
