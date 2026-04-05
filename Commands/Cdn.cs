@@ -199,7 +199,7 @@ public static partial class Cdn
     // This code is taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L197,
     // minus some minor changes.
     // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/3335c38/src/Modules/Owner.cs#L313)
-    private readonly struct CloudflareContent(List<string> urls)
+    internal readonly struct CloudflareContent(List<string> urls)
     {
         public List<string> Files { get; } = urls;
     }
