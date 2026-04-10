@@ -53,6 +53,9 @@ internal class ShellCommandHelpers
         if (cancellationToken.IsCancellationRequested)
             proc.Kill();
 
+        // Wait a bit for the process to be killed
+        await Task.Delay(5000, CancellationToken.None);
+
         return new Setup.Types.ShellCommandResponse(proc.ExitCode, result, error);
     }
 }
