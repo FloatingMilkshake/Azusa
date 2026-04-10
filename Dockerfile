@@ -8,7 +8,6 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine
 LABEL com.centurylinklabs.watchtower.enable="true"
 WORKDIR /app
 COPY --from=build-env /app/out .
-RUN mkdir /root/.ssh && ln -s /run/secrets/ssh_key /root/.ssh/id_ed25519 && echo StrictHostKeyChecking no > /root/.ssh/config
-RUN apk add bash openssh redis icu-libs iputils-ping imagemagick --no-cache
+RUN apk add redis icu-libs iputils-ping imagemagick --no-cache
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENTRYPOINT ["dotnet", "Azusa.dll"]

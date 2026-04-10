@@ -2,12 +2,12 @@ using System.Numerics;
 
 namespace Azusa.Commands;
 
-public class ConvertPermission
+internal class PermissionCommands
 {
     [Command("convertpermissioninteger")]
     [TextAlias("convertpermissions", "permissioninteger", "convertperms", "permission", "perms")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public static async Task ConvertPermissionIntegerCommand(TextCommandContext ctx, string permissions)
+    public static async Task ConvertPermissionIntegerCommandAsync(TextCommandContext ctx, string permissions)
     {
         BigInteger permissionInteger;
         try

@@ -1,64 +1,47 @@
 namespace Azusa;
 
-public class ConfigJson
+internal class ConfigJson
 {
-    [JsonProperty("token")]
-    public string Token { get; private set; }
+    [JsonProperty("token")] internal string Token { get; private set; }
 
-    [JsonProperty("canvas")]
-    public Canvas Canvas { get; set; }
+    [JsonProperty("canvas")] internal Canvas Canvas { get; set; }
 
-    [JsonProperty("s3")]
-    public S3 S3 { get; set; }
+    [JsonProperty("s3")] internal S3 S3 { get; set; }
 
-    [JsonProperty("shortLinks")]
-    public ShortLinks ShortLinks { get; set; }
+    [JsonProperty("shortLinks")] internal ShortLinks ShortLinks { get; set; }
 }
 
-public class Canvas
+internal class Canvas
 {
-    [JsonProperty("apiToken")]
-    public string ApiToken { get; private set; }
+    [JsonProperty("apiToken")] internal string ApiToken { get; private set; }
     
-    [JsonProperty("domain")]
-    public string Domain { get; private set; }
+    [JsonProperty("domain")] internal string Domain { get; private set; }
 }
 
-public class S3
+internal class S3
 {
-    [JsonProperty("accessKey")]
-    public string AccessKey { get; set; }
+    [JsonProperty("accessKey")] internal string AccessKey { get; set; }
 
-    [JsonProperty("baseUrl")]
-    public string BaseUrl { get; set; }
+    [JsonProperty("baseUrl")] internal string BaseUrl { get; set; }
 
-    [JsonProperty("bucket")]
-    public string Bucket { get; set; }
+    [JsonProperty("bucket")] internal string Bucket { get; set; }
 
-    [JsonProperty("endpoint")]
-    public string Endpoint { get; set; }
+    [JsonProperty("endpoint")] internal string Endpoint { get; set; }
 
-    [JsonProperty("region")]
-    public string Region { get; set; }
+    [JsonProperty("region")] internal string Region { get; set; }
 
-    [JsonProperty("secretKey")]
-    public string SecretKey { get; set; }
+    [JsonProperty("secretKey")] internal string SecretKey { get; set; }
 
-    [JsonProperty("token")]
-    public string Token { get; set; }
+    [JsonProperty("token")] internal string Token { get; set; }
 
-    [JsonProperty("urlPrefix")]
-    public string UrlPrefix { get; set; }
+    [JsonProperty("urlPrefix")] internal string UrlPrefix { get; set; }
 
-    [JsonProperty("zoneId")]
-    public string ZoneId { get; set; }
+    [JsonProperty("zoneId")] internal string ZoneId { get; set; }
 }
 
-public class ShortLinks
+internal class ShortLinks
 {
-    [JsonProperty("baseUrl")]
-    public string BaseUrl { get; set; }
+    [JsonProperty("baseUrl")] internal string BaseUrl { get; set; }
 
-    [JsonProperty("secret")]
-    public string Secret { get; set; }
+    [JsonProperty("secret")] internal string Secret { get; set; }
 }

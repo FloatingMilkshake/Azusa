@@ -1,8 +1,8 @@
 namespace Azusa.Events;
 
-public static class MessageEvents
+internal static class MessageEvents
 {
-    public static async Task MessageCreated(DiscordClient client, MessageCreatedEventArgs e)
+    internal static async Task HandleMessageCreatedEventAsync(DiscordClient client, MessageCreatedEventArgs e)
     {
         await ParseWindowsInsidersRssAsync(client, e);
 
@@ -15,14 +15,11 @@ public static class MessageEvents
         if (e.Message.Author?.Id == client.CurrentUser.Id)
             return;
 
-        // try to match content with Insider URL pattern
-        var insiderUrlPattern = RegularExpressions.InsiderUrlPattern();
-
         // ignore non-matching messages or messages that are not from MonitoRSS
-        if (!insiderUrlPattern.IsMatch(e.Message.Content) || e.Message.Author.Id != 944784076735414342)
+        if (!Setup.Constants.RegularExpressions.WindowsInsiderBlogUrlPattern.IsMatch(e.Message.Content) || e.Message.Author.Id != 944784076735414342)
             return;
 
-        var insiderUrlMatch = insiderUrlPattern.Match(e.Message.Content);
+        var insiderUrlMatch = Setup.Constants.RegularExpressions.WindowsInsiderBlogUrlPattern.Match(e.Message.Content);
         var buildNumber1 = insiderUrlMatch.Groups[1].Value;
         var buildNumber2 = insiderUrlMatch.Groups[2].Value;
         var channel1 = insiderUrlMatch.Groups[3].Value;
@@ -83,7 +80,7 @@ public static class MessageEvents
             await msg.CreateReactionAsync(DiscordEmoji.FromName(client, ":bangbang:"));
     }
 
-    private static async Task CheckRssFeedArticlesForUpdatesAsync(DiscordClient client, MessageCreatedEventArgs e)
+    private static async Task CheckRssFeedArticlesForUpdatesAsync(DiscordClient _, MessageCreatedEventArgs e)
     {
         List<string> matches = [
             "node_exporter",

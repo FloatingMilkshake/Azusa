@@ -11,8 +11,6 @@
         source: ./config.json
         target: /app/config.json
     labels: [ "com.centurylinklabs.watchtower.scope=azusa" ]
-    secrets:
-      - ssh_key
   redis:
     image: redis:alpine
     restart: always
@@ -35,7 +33,3 @@
     command: --interval 30 --label-enable --scope azusa
     restart: always
     labels: [ "com.centurylinklabs.watchtower.scope=azusa" ]
-
-secrets:
-  ssh_key:
-    file: ~/.ssh/id_ed25519

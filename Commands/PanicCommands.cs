@@ -1,19 +1,20 @@
 ﻿namespace Azusa.Commands;
 
-public class Panic
+internal class PanicCommands
 {
-    public static readonly List<ulong> authorized = [455432936339144705, 208935109485789184, 455428041586376729, 573984492713279512];
-
-    [Command("panic"), Description("You know what this is for.")]
-    public static async Task PanicCommand(TextCommandContext ctx, [Parameter("who"), Description("You should ignore this if you're not milkshake.")] string who = "")
+    [Command("panic")]
+    [Description("You know what this is for.")]
+    [AllowedProcessors(typeof(TextCommandProcessor))]
+    public static async Task PanicCommandAsync(TextCommandContext ctx,
+        [Parameter("who"), Description("You should ignore this if you're not milkshake.")] string who = "")
     {
-        if (!authorized.Contains(ctx.User.Id))
+        if (!Setup.Constants.PanicAuthorizedUsers.Contains(ctx.User.Id))
         {
             await ctx.RespondAsync("Sorry, you can't use this.");
             return;
         }
 
-        var lastPanic = JsonConvert.DeserializeObject<DateTime?>((await Program.Redis.StringGetAsync("lastPanic")).ToString() ?? "");
+        var lastPanic = JsonConvert.DeserializeObject<DateTime?>((await Setup.Storage.Redis.StringGetAsync("lastPanic")).ToString() ?? "");
         if (lastPanic is not null && lastPanic > DateTime.UtcNow.AddMinutes(-5))
         {
             await ctx.RespondAsync("Sorry, but this can only be used once every 5 minutes.");
@@ -33,15 +34,15 @@ public class Panic
             request.Headers.Add("Priority", "urgent");
             request.Headers.Add("Tags", "warning");
             request.Content = new StringContent("Check in please");
-            await Program.HttpClient.SendAsync(request);
+            await Setup.Constants.HttpClient.SendAsync(request);
         }
         else
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"https://uptime.floatingmilkshake.com/api/push/5ccY6HAwapl41NuIaKEmPcyODh9a6oaM?msg=PANIC%20from%20bot%20by%20{ctx.User.Username}");
-            await Program.HttpClient.SendAsync(request);
+            await Setup.Constants.HttpClient.SendAsync(request);
         }
 
-        await Program.Redis.StringSetAsync("lastPanic", JsonConvert.SerializeObject(DateTime.UtcNow));
+        await Setup.Storage.Redis.StringSetAsync("lastPanic", JsonConvert.SerializeObject(DateTime.UtcNow));
 
         await ctx.RespondAsync("Done.");
     }

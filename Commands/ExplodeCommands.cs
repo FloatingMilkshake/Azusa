@@ -1,12 +1,12 @@
 namespace Azusa.Commands;
 
-public static class Explode
+internal static class ExplodeCommands
 {
     [Command("explode")]
+    [TextAlias("boom")]
     [Description("boom")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    [TextAlias("boom")]
-    public static async Task PingCommand(TextCommandContext ctx)
+    public static async Task ExplodeCommandAsync(TextCommandContext ctx)
     {
         var rand = new Random();
         var chance = rand.Next(4);

@@ -1,15 +1,12 @@
 namespace Azusa.Commands;
 
-public static class Due
+internal static class DueCommands
 {
-    private static readonly int PageSize = 100;
-    private static readonly string ApiPath = $"https://{Program.ConfigJson.Canvas.Domain}/api/v1/planner/items?per_page={PageSize}";
-    
     [Command("due")]
     [Description("Get due assignments from Canvas.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
-    public static async Task DueCommand(TextCommandContext ctx,
+    public static async Task DueCommandAsync(TextCommandContext ctx,
         [Parameter("filter")] [Description("The date to filter to. Relative or absolute. Defaults to 5 days.")] [RemainingText] string filter = "5d")
     {
         var now = DateTime.Now;
@@ -78,14 +75,16 @@ public static class Due
         var (firstPageData, firstPageContent) = await GetSinglePageAsync(date);
         pages.Add(firstPageContent);
         var nextPageUrl = GetNextPageFromHeader(firstPageData);
-        Program.Discord.Logger.LogDebug("Due: Got page 1" + (!string.IsNullOrEmpty(nextPageUrl) ? ", found next page" : ", no next page"));
+        if (Setup.State.Discord.Client.Logger.IsEnabled(LogLevel.Debug))
+            Setup.State.Discord.Client.Logger.LogDebug("Due: Got page 1, {nextPage}", !string.IsNullOrEmpty(nextPageUrl) ? "found next page" : "no next page");
         
         while (!string.IsNullOrEmpty(nextPageUrl))
         {
             var (pageData, pageContent) = await GetSinglePageAsync(date, nextPageUrl);
             pages.Add(pageContent);
             nextPageUrl = GetNextPageFromHeader(pageData);
-            Program.Discord.Logger.LogDebug($"Due: Got page {pages.Count}" + (!string.IsNullOrEmpty(nextPageUrl) ? ", found next page" : ", no next page"));
+            if (Setup.State.Discord.Client.Logger.IsEnabled(LogLevel.Debug))
+                Setup.State.Discord.Client.Logger.LogDebug("Due: Got page {pageNumber}, {nextPage}", pages.Count, !string.IsNullOrEmpty(nextPageUrl) ? "found next page" : "no next page");
         }
         
         return pages;
@@ -101,7 +100,7 @@ public static class Due
     {
         string url;
         if (page is null)
-            url = ApiPath;
+            url = Setup.Constants.CanvasApiPath;
         else
             url = page;
         
@@ -112,8 +111,8 @@ public static class Due
             url += $"&start_date={now:yyyy-MM-dd}&end_date={date:yyyy-MM-dd}";
         
         var request = new HttpRequestMessage(HttpMethod.Get, url);
-        request.Headers.Add("Authorization", $"Bearer {Program.ConfigJson.Canvas.ApiToken}");
-        var response = await Program.HttpClient.SendAsync(request);
+        request.Headers.Add("Authorization", $"Bearer {Setup.Configuration.ConfigJson.Canvas.ApiToken}");
+        var response = await Setup.Constants.HttpClient.SendAsync(request);
         
         if (!response.IsSuccessStatusCode)
             throw new Exception($"Failed to fetch from the Canvas API! {Convert.ToInt32(response.StatusCode)}: {response.ReasonPhrase}");
@@ -133,11 +132,11 @@ public static class Due
         // <https://blah>; rel="next"
         //  ^^^^^^^^^^^^
         
-        var linkHeader = response.Headers.FirstOrDefault(x => x.Key.ToLower() == "link");
+        var linkHeader = response.Headers.FirstOrDefault(x => x.Key.Equals("link", StringComparison.OrdinalIgnoreCase));
         if (linkHeader.Value is null)
             return string.Empty;
         var linkHeaderValue = linkHeader.Value.FirstOrDefault();
-        var nextLinkMatch = Regex.Match(linkHeaderValue, @"<(https:\/\/[^<]+)>; rel=""next""");
+        var nextLinkMatch = Setup.Constants.RegularExpressions.CanvasApiLinkHeaderNextUrlPattern.Match(linkHeaderValue);
         return nextLinkMatch.Groups[1].Value;
     }
     

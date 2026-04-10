@@ -1,12 +1,12 @@
 namespace Azusa.Commands;
 
-public static class Uptime
+internal static class UptimeCommands
 {
     [Command("uptime")]
+    [TextAlias("up")]
     [Description("Check my uptime.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    [TextAlias("up")]
-    public static async Task UptimeCommand(TextCommandContext ctx)
+    public static async Task UptimeCommandAsync(TextCommandContext ctx)
     {
         await ctx.RespondAsync((DateTime.Now - Process.GetCurrentProcess().StartTime).ToString());
     }

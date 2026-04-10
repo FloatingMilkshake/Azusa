@@ -1,11 +1,13 @@
 ﻿namespace Azusa.Commands;
 
-public class NoteSearch
+internal class NoteSearchCommands
 {
-    [Command("notesearch"), Description("Search notes.")]
+    [Command("notesearch")]
     [TextAlias("ns")]
+    [Description("Search notes.")]
+    [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
-    public static async Task NoteSearchCommand(TextCommandContext ctx,
+    public static async Task NoteSearchCommandAsync(TextCommandContext ctx,
         [Parameter("query"), Description("The search query."), RemainingText] string query)
     {
         await ctx.RespondAsync("Searching... 0%");

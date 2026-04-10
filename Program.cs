@@ -1,25 +1,9 @@
 ﻿namespace Azusa;
 
-public static class Program
+internal static class Program
 {
-#pragma warning disable CA2211 // Non-constant fields should not be visible
-    internal static EventId BotEventId { get; } = new(1000, "Azusa");
-    internal static ConfigJson ConfigJson;
-    internal static DiscordClient Discord;
-    public static readonly HttpClient HttpClient = new();
-    internal static IMinioClient Minio;
-#if DEBUG
-    internal static readonly ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379");
-#else
-    internal static readonly ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("redis");
-#endif
-    public static readonly IDatabase Redis = redis.GetDatabase();
-#pragma warning restore CA2211 // Non-constant fields should not be visible
-
     internal static async Task Main()
     {
-        HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Azusa (contact https://floatingmilkshake.com)");
-
         // Read config.json
         string json;
         await using (var fs = File.OpenRead("config.json"))
@@ -28,23 +12,15 @@ public static class Program
             json = await sr.ReadToEndAsync();
         }
 
-        ConfigJson = JsonConvert.DeserializeObject<ConfigJson>(json);
+        Setup.Configuration.ConfigJson = JsonConvert.DeserializeObject<ConfigJson>(json);
 
-        if (ConfigJson is null)
+        if (Setup.Configuration.ConfigJson is null)
         {
-            Discord.Logger.LogCritical(
-                "config.json is malformed. Please be sure it has all of the required values.");
+            Console.WriteLine("config.json is malformed. Please be sure it has all of the required values.");
             Environment.Exit(1);
         }
 
-        Minio = new MinioClient()
-            .WithEndpoint(ConfigJson.S3.Endpoint)
-            .WithCredentials(ConfigJson.S3.AccessKey, ConfigJson.S3.SecretKey)
-            .WithRegion(ConfigJson.S3.Region)
-            .WithSSL()
-            .Build();
-
-        var clientBuilder = DiscordClientBuilder.CreateDefault(ConfigJson.Token, DiscordIntents.All);
+        var clientBuilder = DiscordClientBuilder.CreateDefault(Setup.Configuration.ConfigJson.Token, DiscordIntents.All);
 #if DEBUG
         clientBuilder.SetLogLevel(LogLevel.Debug);
 #else
@@ -62,8 +38,8 @@ public static class Program
         });
         clientBuilder.ConfigureEventHandlers((builder) =>
         {
-            builder.HandleMessageCreated(MessageEvents.MessageCreated);
-            builder.HandleComponentInteractionCreated(InteractionEvents.ComponentInteractionCreated);
+            builder.HandleMessageCreated(MessageEvents.HandleMessageCreatedEventAsync);
+            builder.HandleComponentInteractionCreated(InteractionEvents.HandleComponentInteractionCreatedEventAsync);
         });
         clientBuilder.UseCommands((_, extension) =>
         {
@@ -84,13 +60,12 @@ public static class Program
             });
             extension.AddProcessor(textCommandProcessor);
         });
+        Setup.State.Discord.Client = clientBuilder.Build();
 
-        // Build the client
-        Discord = clientBuilder.Build();
+        await Setup.State.Discord.Client.ConnectAsync();
 
-        // Connect
-        await Discord.ConnectAsync();
-        
+        Setup.Constants.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Azusa (contact https://floatingmilkshake.com)");
+
         await Task.Delay(Timeout.InfiniteTimeSpan);
     }
 }

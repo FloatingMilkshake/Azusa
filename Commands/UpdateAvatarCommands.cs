@@ -1,27 +1,29 @@
 ﻿namespace Azusa.Commands;
 
-public class Avy
+internal class UpdateAvatarCommands
 {
-    [Command("avy")]
+    [Command("updateavatar")]
+    [TextAlias("updateavy")]
     [Description("Update your avatar.")]
+    [AllowedProcessors(typeof(TextCommandProcessor))]
     [RequireApplicationOwner]
-    public static async Task AvyCommand(TextCommandContext ctx)
+    public static async Task AvyCommandAsync(TextCommandContext ctx)
     {
         await ctx.RespondAsync("Working on it...");
 
-        bool wasFaviconCreated = false;
+        bool wasFaviconCreated;
         try
         {
-            MemoryStream memStream = new(await Program.HttpClient.GetByteArrayAsync(ctx.User.AvatarUrl));
+            MemoryStream memStream = new(await Setup.Constants.HttpClient.GetByteArrayAsync(ctx.User.AvatarUrl));
 
             var args = new PutObjectArgs()
-                .WithBucket(Program.ConfigJson.S3.Bucket)
+                .WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
                 .WithObject("avatar.png")
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
                 .WithContentType("image/png");
 
-            await Program.Minio.PutObjectAsync(args);
+            await Setup.State.Minio.PutObjectAsync(args);
 
             string tmpAvatarPath = RuntimeInformation.OSDescription.Contains("Windows")
                 ? $"{Path.GetTempPath()}\\avatar.png"
@@ -30,19 +32,19 @@ public class Avy
                 ? $"{Path.GetTempPath()}\\favicon.png"
                 : "/tmp/favicon.png";
 
-            await File.WriteAllBytesAsync(tmpAvatarPath, await Program.HttpClient.GetByteArrayAsync(ctx.User.AvatarUrl));
-            var magickResult = await Shell.ShellCommand($"magick {tmpAvatarPath} -resize 192x192 {tmpFaviconPath}", CancellationToken.None);
+            await File.WriteAllBytesAsync(tmpAvatarPath, await Setup.Constants.HttpClient.GetByteArrayAsync(ctx.User.AvatarUrl));
+            var magickResult = await Helpers.ShellCommandHelpers.RunShellCommandAsync($"magick {tmpAvatarPath} -resize 192x192 {tmpFaviconPath}", CancellationToken.None);
             wasFaviconCreated = true;
 
             memStream = new(await File.ReadAllBytesAsync(tmpFaviconPath));
             args = new PutObjectArgs()
-                .WithBucket(Program.ConfigJson.S3.Bucket)
+                .WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
                 .WithObject("favicon.png")
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
                 .WithContentType("image/png");
 
-            await Program.Minio.PutObjectAsync(args);
+            await Setup.State.Minio.PutObjectAsync(args);
 
             File.Delete(tmpAvatarPath);
             File.Delete(tmpFaviconPath);
@@ -61,17 +63,17 @@ public class Avy
         // This code is (mostly) taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L113.
         // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/1f32e03/src/Modules/Owner.cs#L232)
 
-        Cdn.CloudflareContent content = new([Program.ConfigJson.S3.UrlPrefix + "avatar.png", Program.ConfigJson.S3.UrlPrefix + "favicon.png"]);
+        Setup.Types.CloudflareContent content = new([Setup.Configuration.ConfigJson.S3.UrlPrefix + "avatar.png", Setup.Configuration.ConfigJson.S3.UrlPrefix + "favicon.png"]);
         var cloudflareContentString = JsonConvert.SerializeObject(content);
         bool wasCloudflareCachePurged = false;
         string cloudflareCachePurgeStatusCode = default;
         try
         {
-            using HttpRequestMessage request = new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Program.ConfigJson.S3.ZoneId}/purge_cache/files");
+            using HttpRequestMessage request = new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.Configuration.ConfigJson.S3.ZoneId}/purge_cache/files");
             request.Content = new StringContent(cloudflareContentString, Encoding.UTF8, "application/json");
-            request.Headers.Add("Authorization", $"Bearer {Program.ConfigJson.S3.Token}");
+            request.Headers.Add("Authorization", $"Bearer {Setup.Configuration.ConfigJson.S3.Token}");
 
-            var cachePurgeResponse = await Program.HttpClient.SendAsync(request);
+            var cachePurgeResponse = await Setup.Constants.HttpClient.SendAsync(request);
             var responseText = await cachePurgeResponse.Content.ReadAsStringAsync();
 
             if (cachePurgeResponse.IsSuccessStatusCode)

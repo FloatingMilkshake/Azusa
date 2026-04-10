@@ -1,23 +1,25 @@
 ﻿namespace Azusa.Commands;
 
 [Command("cdn")]
-[AllowedProcessors(typeof(TextCommandProcessor))]
 [Description("Manage files uploaded to R2.")]
+[AllowedProcessors(typeof(TextCommandProcessor))]
 [RequireApplicationOwner]
-public static partial class Cdn
+internal static partial class CdnCommands
 {
     [Command("upload")]
     [Description("Upload a file to R2. An uploaded file attachment will override the `link` argument!")]
     [TextAlias("up", "u")]
-    public static async Task Upload(TextCommandContext ctx,
+    public static async Task CdnUploadCommandAsync(TextCommandContext ctx,
         [Parameter("name")] [Description("The name for the uploaded file.")]
         string name,
         [Parameter("link")] [Description("A link to a file to upload.")]
-        string link = null)
+        string link = default)
     {
-        var file = ctx.Message.Attachments.FirstOrDefault();
+        DiscordAttachment file = default;
+        if (ctx.Message.Attachments.Count > 0)
+            file = ctx.Message.Attachments[0];
         
-        if (file is null && link is null)
+        if (file == default && link == default)
         {
             await ctx.RespondAsync("You must provide a link or file to upload!");
             return;
@@ -37,18 +39,15 @@ public static partial class Cdn
         string fileName;
 
         // Get file, where 'link' is the URL
-        MemoryStream memStream = new(await Program.HttpClient.GetByteArrayAsync(link));
+        MemoryStream memStream = new(await Setup.Constants.HttpClient.GetByteArrayAsync(link));
 
         try
         {
-            var bucket = Program.ConfigJson.S3.Bucket;
+            var bucket = Setup.Configuration.ConfigJson.S3.Bucket;
 
             // Strip the URL down to just the file name
 
-            // Regex partially taken from https://stackoverflow.com/a/26253039
-            var fileNamePattern = FileNamePattern();
-
-            var fileNameAndExtension = fileNamePattern.Match(link ?? "").Value;
+            var fileNameAndExtension = Setup.Constants.RegularExpressions.CdnFileNamePattern.Match(link ?? "").Value;
 
             // From here on out we can be sure that 'fileNameAndExtension' is in the format 'example.png'.
 
@@ -57,8 +56,7 @@ public static partial class Cdn
             // The user might have included an extension in their desired filename. We should remove it.
             // We should not just match `extension` because the user may have provided a different one!
             // Let's use regex instead.
-            var fileExtensionPattern = FileExtensionPattern();
-            var userExtension = fileExtensionPattern.Match(name).Value;
+            var userExtension = Setup.Constants.RegularExpressions.CdnFileExtensionPattern.Match(name).Value;
             if (userExtension != "")
                 name = name.Replace(userExtension, "");
 
@@ -84,7 +82,7 @@ public static partial class Cdn
                 .WithObjectSize(memStream.Length)
                 .WithContentType(mimeType);
 
-            await Program.Minio.PutObjectAsync(args);
+            await Setup.State.Minio.PutObjectAsync(args);
         }
         catch (MinioException e)
         {
@@ -97,27 +95,27 @@ public static partial class Cdn
             return;
         }
 
-        await ctx.RespondAsync($"Upload successful!\n<{Program.ConfigJson.S3.BaseUrl}/{fileName}>");
+        await ctx.RespondAsync($"Upload successful!\n<{Setup.Configuration.ConfigJson.S3.BaseUrl}/{fileName}>");
     }
 
     [Command("delete")]
     [Description("Delete a file from R2.")]
     [TextAlias("del", "d")]
-    public static async Task DeleteUpload(TextCommandContext ctx,
+    public static async Task CdnDeleteCommandAsync(TextCommandContext ctx,
         [Parameter("file")] [Description("The file to delete.")]
         string fileToDelete)
     {
         fileToDelete = fileToDelete.Replace("<", "").Replace(">", "");
 
-        var fileName = fileToDelete.Replace($"{Program.ConfigJson.S3.BaseUrl}/", "");
+        var fileName = fileToDelete.Replace($"{Setup.Configuration.ConfigJson.S3.BaseUrl}/", "");
 
         try
         {
             var args = new RemoveObjectArgs()
-                .WithBucket(Program.ConfigJson.S3.Bucket)
+                .WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
                 .WithObject(fileName);
 
-            await Program.Minio.RemoveObjectAsync(args);
+            await Setup.State.Minio.RemoveObjectAsync(args);
         }
         catch (MinioException e)
         {
@@ -132,21 +130,21 @@ public static partial class Cdn
 
         await ctx.RespondAsync("File deleted successfully!\nAttempting to purge Cloudflare cache...");
 
-        var cloudflareUrlPrefix = Program.ConfigJson.S3.UrlPrefix;
+        var cloudflareUrlPrefix = Setup.Configuration.ConfigJson.S3.UrlPrefix;
 
         // This code is (mostly) taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L113.
         // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/1f32e03/src/Modules/Owner.cs#L232)
 
-        CloudflareContent content = new([cloudflareUrlPrefix + fileName]);
+        Setup.Types.CloudflareContent content = new([cloudflareUrlPrefix + fileName]);
         var cloudflareContentString = JsonConvert.SerializeObject(content);
         try
         {
             using HttpRequestMessage request =
-                new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Program.ConfigJson.S3.ZoneId}/purge_cache/files");
+                new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.Configuration.ConfigJson.S3.ZoneId}/purge_cache/files");
             request.Content = new StringContent(cloudflareContentString, Encoding.UTF8, "application/json");
-            request.Headers.Add("Authorization", $"Bearer {Program.ConfigJson.S3.Token}");
+            request.Headers.Add("Authorization", $"Bearer {Setup.Configuration.ConfigJson.S3.Token}");
 
-            var response = await Program.HttpClient.SendAsync(request);
+            var response = await Setup.Constants.HttpClient.SendAsync(request);
             var responseText = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
@@ -164,16 +162,16 @@ public static partial class Cdn
     [Command("check")]
     [Description("Check whether a file exists in the R2 bucket. Uses the R2 API to avoid caching.")]
     [TextAlias("c")]
-    public static async Task CdnPreview(TextCommandContext ctx,
+    public static async Task CdnPreviewCommandAsync(TextCommandContext ctx,
         [Parameter("name")] [Description("The name (or link) of the file to check.")]
         string name)
     {
-        if (name.Contains(Program.ConfigJson.S3.BaseUrl))
-            name = name.Replace(Program.ConfigJson.S3.BaseUrl, "").Trim('/');
+        if (name.Contains(Setup.Configuration.ConfigJson.S3.BaseUrl))
+            name = name.Replace(Setup.Configuration.ConfigJson.S3.BaseUrl, "").Trim('/');
 
         try
         {
-            await Program.Minio.GetObjectAsync(new GetObjectArgs().WithBucket(Program.ConfigJson.S3.Bucket)
+            await Setup.State.Minio.GetObjectAsync(new GetObjectArgs().WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
                 .WithObject(name).WithFile(name));
         }
         catch (ObjectNotFoundException)
@@ -188,19 +186,5 @@ public static partial class Cdn
         }
 
         await ctx.RespondAsync("That file exists!");
-    }
-
-    [GeneratedRegex(@"[^/\\&\?#]+\.\w*(?=([\?&#].*$|$))")]
-    private static partial Regex FileNamePattern();
-
-    [GeneratedRegex(@"\.\w*(?=([\?&#].*$|$))")]
-    private static partial Regex FileExtensionPattern();
-
-    // This code is taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L197,
-    // minus some minor changes.
-    // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/3335c38/src/Modules/Owner.cs#L313)
-    internal readonly struct CloudflareContent(List<string> urls)
-    {
-        public List<string> Files { get; } = urls;
     }
 }

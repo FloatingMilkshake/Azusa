@@ -1,14 +1,15 @@
 ﻿namespace Azusa.Commands;
 
-public static class Err
+internal static class ErrorCommands
 {
-    [Command("err")]
+    [Command("error")]
+    [TextAlias("err")]
     [Description("Look up an error code with the Microsoft Error Lookup Tool.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public static async Task ErrCommand(TextCommandContext ctx,
+    public static async Task ErrorCommandAsync(TextCommandContext ctx,
         [Parameter("code"), Description("The error code to look up.")] string code)
     {
-        var result = (await (await Program.HttpClient.GetAsync($"https://err.milkshake.services?code={code}")).Content.ReadAsStringAsync())
+        var result = (await (await Setup.Constants.HttpClient.GetAsync($"https://err.milkshake.services?code={code}")).Content.ReadAsStringAsync())
             .Replace("<pre>", "").Replace("</pre>", "");
 
         result = $"```\n{result}\n```";

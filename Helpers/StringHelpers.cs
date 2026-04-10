@@ -1,8 +1,8 @@
 namespace Azusa.Helpers;
 
-public static class StringHelpers
+internal static class StringHelpers
 {
-    public static async Task<List<string>> SplitStringAsync(string input, bool respond = false, int maxLength = 1980, CommandContext ctx = null, string completionMessage = null)
+    internal static async Task<List<string>> SplitStringAsync(string input, bool respond = false, int maxLength = 1980, CommandContext ctx = null, string completionMessage = null)
     {
         List<string> split = [];
         
@@ -73,7 +73,7 @@ public static class StringHelpers
         return [];
     }
     
-    public static string Truncate(string input, int maxLength)
+    internal static string Truncate(string input, int maxLength)
     {
         if (input is null && maxLength <= 9)
             return "[invalid]";

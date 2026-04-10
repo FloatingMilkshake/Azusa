@@ -3,14 +3,14 @@ using DSharpPlus.Commands.Trees;
 
 namespace Azusa.Commands;
 
-public static class Help
+internal static class HelpCommands
 {
     // Most of this is taken from DSharpPlus.CommandsNext and adapted to fit here.
     // https://github.com/DSharpPlus/DSharpPlus/blob/1c1aa15/DSharpPlus.CommandsNext/CommandsNextExtension.cs#L829
     [Command("help")]
     [Description("Displays command help.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    public static async Task HelpCommand(TextCommandContext ctx, [Description("Command to provide help for.")] [RemainingText] string command = "")
+    public static async Task HelpCommandAsync(TextCommandContext ctx, [Description("Command to provide help for.")] [RemainingText] string command = "")
     {
         var commandSplit = command.Split(' ');
 
@@ -153,7 +153,7 @@ public static class Help
         await ctx.RespondAsync(builder);
     }
 
-    private static IEnumerable<ContextCheckAttribute> CheckPermissions(TextCommandContext ctx, Command command)
+    private static List<ContextCheckAttribute> CheckPermissions(TextCommandContext ctx, Command command)
     {
         var contextChecks = command.Attributes.Where(x => x is ContextCheckAttribute);
         var failedChecks = new List<ContextCheckAttribute>();
@@ -168,7 +168,7 @@ public static class Help
 
             if (check is RequireApplicationOwnerAttribute requireApplicationOwnerAttribute)
                 // null-forgiving here is fine because im the only one using this bot & its not in a team
-                if (!Program.Discord.CurrentApplication.Owners!.Any(x => x.Id == ctx.User.Id))
+                if (!Setup.State.Discord.Client.CurrentApplication.Owners!.Any(x => x.Id == ctx.User.Id))
                     failedChecks.Add(requireApplicationOwnerAttribute);
         }
 

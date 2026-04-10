@@ -1,48 +1,45 @@
-﻿using static Azusa.Commands.Eval;
+﻿namespace Azusa.Events;
 
-namespace Azusa.Events
+internal class InteractionEvents
 {
-    public class InteractionEvents
+    internal static async Task HandleComponentInteractionCreatedEventAsync(DiscordClient _, ComponentInteractionCreatedEventArgs e)
     {
-        public static async Task ComponentInteractionCreated(DiscordClient _, ComponentInteractionCreatedEventArgs e)
+        switch (e.Id)
         {
-            switch (e.Id)
-            {
-                case "eval-cancel-button":
+            case "button-callback-eval-cancel":
+                {
+                    if (!Setup.State.Caches.CancellationTokens.TryGetValue(e.Message.Id, out CancellationTokenSource cancellationTokenSource))
                     {
-                        if (!Cancellations.ContainsKey(e.Message.Id))
-                        {
-                            await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent("Working on it...")
-                            .AddActionRowComponent(new DiscordActionRowComponent(
-                                [new DiscordButtonComponent(DiscordButtonStyle.Danger, "eval-cancel-button", "Failed to Cancel", true)]
-                            )));
-                            return;
-                        }
-
-                        if (e.User.Id != e.Message.Reference.Message.Author.Id)
-                        {
-                            await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource,
-                                new DiscordInteractionResponseBuilder().WithContent(
-                                    "Only the person that used this command can cancel it!").AsEphemeral());
-                            return;
-                        }
-
-                        await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.DeferredMessageUpdate);
-
                         await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent("Working on it...")
-                            .AddActionRowComponent(new DiscordActionRowComponent(
-                                [new DiscordButtonComponent(DiscordButtonStyle.Danger, "eval-cancel-button", "Cancelling...", true)]
-                            )));
-
-                        Cancellations[e.Message.Id].Cancel();
-
-                        break;
+                        .AddActionRowComponent(new DiscordActionRowComponent(
+                            [new DiscordButtonComponent(DiscordButtonStyle.Danger, "button-callback-eval-cancel", "Failed to Cancel", true)]
+                        )));
+                        return;
                     }
-                default:
-                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource,
-                        new DiscordInteractionResponseBuilder().WithContent($"Unknown interaction ID `{e.Id}`!").AsEphemeral());
+
+                    if (e.User.Id != e.Message.Reference.Message.Author.Id)
+                    {
+                        await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource,
+                            new DiscordInteractionResponseBuilder().WithContent(
+                                "Only the person that used this command can cancel it!").AsEphemeral(true));
+                        return;
+                    }
+
+                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.DeferredMessageUpdate);
+
+                    await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent("Working on it...")
+                        .AddActionRowComponent(new DiscordActionRowComponent(
+                            [new DiscordButtonComponent(DiscordButtonStyle.Danger, "button-callback-eval-cancel", "Cancelling...", true)]
+                        )));
+
+                    cancellationTokenSource.Cancel();
+
                     break;
-            }
+                }
+            default:
+                await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource,
+                    new DiscordInteractionResponseBuilder().WithContent($"Unknown interaction ID `{e.Id}`!").AsEphemeral(true));
+                break;
         }
     }
 }

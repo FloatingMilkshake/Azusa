@@ -1,18 +1,18 @@
 namespace Azusa.Commands;
 
-public class MimeType
+internal class MimeTypeCommands
 {
     [Command("mimetype")]
+    [TextAlias("mime", "type")]
     [Description("Check the mime type of a file online.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    [TextAlias("mime", "type")]
-    public static async Task MimeTypeCommand(CommandContext ctx,
+    public static async Task MimeTypeCommandAsync(CommandContext ctx,
         [Parameter("file")]
         [Description("The path to the file to check the mime type for.")] string file)
     {
         file = file.Replace("<", "").Replace(">", "");
         
-        var response = await Program.HttpClient.GetAsync(file);
+        var response = await Setup.Constants.HttpClient.GetAsync(file);
         if (response.IsSuccessStatusCode)
             await ctx.RespondAsync(response.Content.Headers.ContentType?.ToString() ?? "none");
         else
