@@ -8,6 +8,7 @@ internal static class UptimeCommands
     [AllowedProcessors(typeof(TextCommandProcessor))]
     public static async Task UptimeCommandAsync(TextCommandContext ctx)
     {
-        await ctx.RespondAsync((DateTime.Now - Process.GetCurrentProcess().StartTime).ToString());
+        var uptime = (DateTime.Now - Process.GetCurrentProcess().StartTime);
+        await ctx.RespondAsync($"{uptime.Humanize()} ({uptime})");
     }
 }
