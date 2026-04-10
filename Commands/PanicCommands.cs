@@ -38,7 +38,7 @@ internal class PanicCommands
         }
         else
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"https://uptime.floatingmilkshake.com/api/push/5ccY6HAwapl41NuIaKEmPcyODh9a6oaM?msg=PANIC%20from%20bot%20by%20{ctx.User.Username}");
+            var request = new HttpRequestMessage(HttpMethod.Get, $"https://uptime.milkshake.services/api/push/5ccY6HAwapl41NuIaKEmPcyODh9a6oaM?msg=PANIC%20from%20bot%20by%20{ctx.User.Username}");
             await Setup.Constants.HttpClient.SendAsync(request);
         }
 
