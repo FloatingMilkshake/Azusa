@@ -3,7 +3,7 @@ namespace Azusa.Commands;
 internal static class ExplodeCommands
 {
     [Command("explode")]
-    [TextAlias("boom")]
+    [TextAlias("boom", "kaboom", "kaplode", "didsomebodysayboom")]
     [Description("boom")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     public static async Task ExplodeCommandAsync(TextCommandContext ctx)
