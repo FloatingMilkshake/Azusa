@@ -5,14 +5,7 @@ internal static class Program
     internal static async Task Main()
     {
         // Read config.json
-        string json;
-        await using (var fs = File.OpenRead("config.json"))
-        using (StreamReader sr = new(fs, new UTF8Encoding(false)))
-        {
-            json = await sr.ReadToEndAsync();
-        }
-
-        Setup.Configuration.ConfigJson = JsonConvert.DeserializeObject<ConfigJson>(json);
+        Setup.Configuration.ConfigJson = JsonConvert.DeserializeObject<ConfigJson>(await File.ReadAllTextAsync("config.json"));
 
         if (Setup.Configuration.ConfigJson is null)
         {
@@ -33,13 +26,12 @@ internal static class Program
         });
         clientBuilder.UseInteractivity(new InteractivityConfiguration
         {
-            PollBehaviour = PollBehaviour.KeepEmojis,
             Timeout = TimeSpan.FromSeconds(300)
         });
         clientBuilder.ConfigureEventHandlers((builder) =>
         {
-            builder.HandleMessageCreated(MessageEvents.HandleMessageCreatedEventAsync);
-            builder.HandleComponentInteractionCreated(InteractionEvents.HandleComponentInteractionCreatedEventAsync);
+            builder.HandleMessageCreated(MessageEvents.HandleMessageCreatedEventAsync)
+                   .HandleComponentInteractionCreated(InteractionEvents.HandleComponentInteractionCreatedEventAsync);
         });
         clientBuilder.UseCommands((_, extension) =>
         {

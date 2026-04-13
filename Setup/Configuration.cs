@@ -1,6 +1,6 @@
 ﻿namespace Azusa.Setup;
 
-internal class Configuration
+internal static class Configuration
 {
     internal static ConfigJson ConfigJson;
 }

@@ -209,7 +209,7 @@ internal static class DueCommands
                         ? dueDate.Value.ToLocalTime().ToString("MM/dd @ hh:mmtt").ToLower()
                         : dueDate.Value.ToLocalTime().ToString("MM/dd/yy @ hh:mmtt").ToLower()
                     : "[error]";
-                output += $"- **{StringHelpers.Truncate(item["plannable"]?["title"]?.ToString(), 30)}**, due {dueDateStr}\n";
+                output += $"- **{item["plannable"]?["title"]?.ToString().Truncate(30)}**, due {dueDateStr}\n";
             }
         }
         

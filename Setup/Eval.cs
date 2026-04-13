@@ -1,13 +1,13 @@
 ﻿namespace Azusa.Setup;
 
-public class Eval
+public static class Eval
 {
     internal static readonly string[] Imports =
     [
         "System", "System.Collections.Generic", "System.Linq",
         "System.Text", "System.Threading.Tasks", "DSharpPlus", "DSharpPlus.Commands",
         "DSharpPlus.Entities", "Microsoft.Extensions.Logging", "Newtonsoft.Json",
-        Assembly.GetExecutingAssembly().GetName().Name
+        "Azusa"
     ];
 
     public class Globals

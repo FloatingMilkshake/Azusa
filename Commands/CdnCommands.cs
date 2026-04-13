@@ -4,7 +4,7 @@
 [Description("Manage files uploaded to R2.")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [RequireApplicationOwner]
-internal static partial class CdnCommands
+internal static class CdnCommands
 {
     [Command("upload")]
     [Description("Upload a file to R2. An uploaded file attachment will override the `link` argument!")]

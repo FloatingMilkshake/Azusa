@@ -53,7 +53,7 @@ internal static class EvalCommands
                     return;
                 }
 
-                var splitOutput = await StringHelpers.SplitStringAsync(result.ReturnValue.ToString());
+                var splitOutput = result.ReturnValue.ToString().SplitForDiscord();
 
                 foreach (var part in splitOutput)
                 {

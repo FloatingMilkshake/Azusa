@@ -17,9 +17,9 @@ internal static class PingCommands
         string redisLatency;
         try
         {
-            redisLatency = $"{(await Setup.Storage.Redis.PingAsync()).TotalMilliseconds.ToString()}ms";
+            redisLatency = $"{(await Setup.Storage.Redis.PingAsync()).TotalMilliseconds}ms";
         }
-        catch
+        catch (Exception) // I don't know what specific exception this might throw?
         {
             redisLatency = "Unreachable!";
         }

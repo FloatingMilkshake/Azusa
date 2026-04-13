@@ -1,5 +1,5 @@
 global using Azusa.Events;
-global using Azusa.Helpers;
+global using Azusa.Extensions;
 global using DSharpPlus;
 global using DSharpPlus.Commands;
 global using DSharpPlus.Commands.ArgumentModifiers;

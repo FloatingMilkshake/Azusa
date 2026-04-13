@@ -14,6 +14,12 @@ internal static class ErrorCommands
 
         result = $"```\n{result}\n```";
 
-        await Helpers.StringHelpers.SplitStringAsync(result, true, ctx: ctx);
+        var splitResponse = result.SplitForDiscord();
+
+        await ctx.RespondAsync(splitResponse.First());
+        foreach (var part in splitResponse.Skip(1))
+        {
+            await ctx.Channel.SendMessageAsync(part);
+        }
     }
 }

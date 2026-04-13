@@ -1,6 +1,6 @@
 ﻿namespace Azusa.Events;
 
-internal class InteractionEvents
+internal static class InteractionEvents
 {
     internal static async Task HandleComponentInteractionCreatedEventAsync(DiscordClient _, ComponentInteractionCreatedEventArgs e)
     {

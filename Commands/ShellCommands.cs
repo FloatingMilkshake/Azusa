@@ -24,7 +24,7 @@ internal class ShellCommands
         Setup.State.Caches.CancellationTokens.Add(msg.Id, new CancellationTokenSource());
         var cancellationToken = Setup.State.Caches.CancellationTokens[msg.Id].Token;
 
-        var cmdResponse = await Helpers.ShellCommandHelpers.RunShellCommandAsync(command, cancellationToken);
+        var cmdResponse = await Setup.Types.ShellCommand.RunAsync(command, cancellationToken);
 
         if (cancellationToken.IsCancellationRequested)
         {
@@ -33,7 +33,7 @@ internal class ShellCommands
             return;
         }
 
-        var splitOutput = await StringHelpers.SplitStringAsync($"```\n{cmdResponse.Output}\n{cmdResponse.Error}\n```");
+        var splitOutput = $"```\n{cmdResponse.Output}\n{cmdResponse.Error}\n```".SplitForDiscord();
 
         foreach (var part in splitOutput)
         {

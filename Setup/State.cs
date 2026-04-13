@@ -1,13 +1,13 @@
 ﻿namespace Azusa.Setup;
 
-internal class State
+internal static class State
 {
-    internal class Discord
+    internal static class Discord
     {
         internal static DiscordClient Client;
     }
 
-    internal class Caches
+    internal static class Caches
     {
         public static readonly Dictionary<ulong, CancellationTokenSource> CancellationTokens = [];
     }
