@@ -4,6 +4,7 @@ global using DSharpPlus;
 global using DSharpPlus.Commands;
 global using DSharpPlus.Commands.ArgumentModifiers;
 global using DSharpPlus.Commands.ContextChecks;
+global using DSharpPlus.Commands.EventArgs;
 global using DSharpPlus.Commands.Processors.TextCommands;
 global using DSharpPlus.Commands.Processors.TextCommands.Parsing;
 global using DSharpPlus.Commands.Trees.Metadata;

@@ -40,6 +40,8 @@ internal static class Program
                 t.IsClass && t.Namespace is not null && t.Namespace.Contains("Azusa.Commands") &&
                 !t.IsNested).ToList();
 
+            extension.CommandErrored += Errors.CommandErrors.HandleCommandErroredEventAsync;
+
             extension.AddCommands(commandTypes, 799644062973427743);
 
             TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
@@ -51,6 +53,9 @@ internal static class Program
 #endif
             });
             extension.AddProcessor(textCommandProcessor);
+        }, new CommandsConfiguration
+        {
+            UseDefaultCommandErrorHandler = false,
         });
         Setup.State.Discord.Client = clientBuilder.Build();
 

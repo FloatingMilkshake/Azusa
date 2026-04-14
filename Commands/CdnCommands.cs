@@ -86,12 +86,12 @@ internal static class CdnCommands
         }
         catch (MinioException e)
         {
-            await ctx.RespondAsync($"An API error occured while uploading!```\n{e.GetType()}: {e.Message}\n{e.StackTrace}```");
+            await ctx.RespondAsync($"An API error occured while uploading! `{e.GetType()}: {e.Message}`");
             return;
         }
         catch (Exception e)
         {
-            await ctx.RespondAsync($"An unexpected error occured while uploading!```\n{e.GetType()}: {e.Message}\n{e.StackTrace}```");
+            await ctx.RespondAsync($"An unexpected error occured while uploading! `{e.GetType()}: {e.Message}`");
             return;
         }
 

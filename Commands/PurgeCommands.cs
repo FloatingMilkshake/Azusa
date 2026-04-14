@@ -32,9 +32,9 @@ internal static class PurgeCommands
             }
             catch (Exception ex)
             {
-                var response = $"An unknown error occurred:\n```\n{ex.GetType()}: {ex.Message}\n{ex.StackTrace}\n```";
+                var response = $"An unknown error occurred: `{ex.GetType()}: {ex.Message}`";
                 if (ex.InnerException is not null)
-                    response += $"```\n{ex.InnerException.GetType()}: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}\n```";
+                    response += $": `{ex.InnerException.GetType()}: {ex.InnerException.Message}`";
                 await ctx.RespondAsync(response);
                 return;
             }
@@ -58,9 +58,9 @@ internal static class PurgeCommands
         }
         catch (Exception ex)
         {
-            var response = $"An unknown error occurred:\n```\n{ex.GetType()}: {ex.Message}\n{ex.StackTrace}\n```";
+            var response = $"An unknown error occurred: `{ex.GetType()}: {ex.Message}`";
             if (ex.InnerException is not null)
-                response += $"```\n{ex.InnerException.GetType()}: {ex.InnerException.Message}\n{ex.InnerException.StackTrace}\n```";
+                response += $": `{ex.InnerException.GetType()}: {ex.InnerException.Message}`";
             await ctx.RespondAsync(response);
             return;
         }
