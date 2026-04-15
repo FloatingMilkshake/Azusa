@@ -91,7 +91,8 @@ internal static class MessageEvents
             "uptime-kuma",
 	        "immich",
             "pocket-id",
-            "pi-hole"
+            "pi-hole",
+            "caddy"
         ];
 
         // MonitoRSS only
