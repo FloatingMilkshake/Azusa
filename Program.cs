@@ -31,7 +31,10 @@ internal static class Program
         clientBuilder.ConfigureEventHandlers((builder) =>
         {
             builder.HandleMessageCreated(MessageEvents.HandleMessageCreatedEventAsync)
-                   .HandleComponentInteractionCreated(InteractionEvents.HandleComponentInteractionCreatedEventAsync);
+                   .HandleComponentInteractionCreated(InteractionEvents.HandleComponentInteractionCreatedEventAsync)
+                   .HandleGuildMemberAdded(MemberEvents.HandleGuildMemberAddedEventAsync)
+                   .HandleGuildMemberRemoved(MemberEvents.HandleGuildMemberRemovedEventAsync)
+                   .HandleGuildMemberUpdated(MemberEvents.HandleGuildMemberUpdatedEventAsync);
         });
         clientBuilder.UseCommands((_, extension) =>
         {
