@@ -6,7 +6,7 @@ internal class NoteSearchCommands
     [TextAlias("ns")]
     [Description("Search notes.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    [RequireApplicationOwner]
+    [Secret]
     public static async Task NoteSearchCommandAsync(TextCommandContext ctx,
         [Parameter("query"), Description("The search query."), RemainingText] string query)
     {

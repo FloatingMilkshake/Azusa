@@ -5,15 +5,10 @@ internal class PanicCommands
     [Command("panic")]
     [Description("You know what this is for.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
+    [Secret]
     public static async Task PanicCommandAsync(TextCommandContext ctx,
         [Parameter("who"), Description("You should ignore this if you're not milkshake.")] string who = "")
     {
-        if (!Setup.Constants.PanicAuthorizedUsers.Contains(ctx.User.Id))
-        {
-            await ctx.RespondAsync("Sorry, you can't use this.");
-            return;
-        }
-
         var lastPanic = JsonConvert.DeserializeObject<DateTime?>((await Setup.Storage.Redis.StringGetAsync("lastPanic")).ToString() ?? "");
         if (lastPanic is not null && lastPanic > DateTime.UtcNow.AddMinutes(-5))
         {
@@ -21,14 +16,8 @@ internal class PanicCommands
             return;
         }
 
-        if (who == "cf")
+        if (who == "cf" && (ctx.User.Id != 455432936339144705 || ctx.User.Id != 208935109485789184))
         {
-            if (ctx.User.Id != 455432936339144705 && ctx.User.Id != 208935109485789184)
-            {
-                await ctx.RespondAsync("Sorry, you can't do that.");
-                return;
-            }
-
             var request = new HttpRequestMessage(HttpMethod.Post, "https://ntfy.sh/mistralton_pager_alerts");
             request.Headers.Add("Title", "Please check Discord ASAP");
             request.Headers.Add("Priority", "urgent");

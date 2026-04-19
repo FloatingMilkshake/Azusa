@@ -1,4 +1,7 @@
-﻿namespace Azusa.Errors;
+﻿using Azusa.Attributes;
+using DSharpPlus.Commands.Exceptions;
+
+namespace Azusa.Errors;
 
 internal static class CommandErrors
 {
@@ -9,6 +12,13 @@ internal static class CommandErrors
             return;
 
         var context = e.Context.As<TextCommandContext>();
+
+        if (e.Exception is ChecksFailedException checksFailedException &&
+            checksFailedException.Errors.Any(x => x.ContextCheckAttribute is RequireApplicationOwnerAttribute or RequirePermissionsAttribute or SecretAttribute))
+        {
+            await context.RespondAsync("Sorry, you aren't allowed to use this command! If you think you should be able to, please ask Milkshake.");
+            return;
+        }
 
         var response = $"An unexpected error occurred: `{e.Exception.GetType()}: {e.Exception.Message}`";
         if (e.Exception.InnerException is not null)

@@ -45,6 +45,8 @@ internal static class Program
 
             extension.CommandErrored += Errors.CommandErrors.HandleCommandErroredEventAsync;
 
+            extension.AddCheck<SecretContextCheck>();
+
             extension.AddCommands(commandTypes, 799644062973427743);
 
             TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration

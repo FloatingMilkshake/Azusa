@@ -1,3 +1,4 @@
+global using Azusa.Attributes;
 global using Azusa.Events;
 global using Azusa.Extensions;
 global using DSharpPlus;
