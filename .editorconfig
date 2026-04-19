@@ -13,3 +13,6 @@ dotnet_style_require_accessibility_modifiers = always
 
 # IDE0305: Collection initialization can be simplified
 dotnet_diagnostic.IDE0305.severity = none
+
+# SYSLIB1045: Convert to 'GeneratedRegexAttribute'.
+dotnet_diagnostic.SYSLIB1045.severity = none
