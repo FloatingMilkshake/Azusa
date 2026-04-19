@@ -4,18 +4,9 @@ internal class ConfigJson
 {
     [JsonProperty("token")] internal string Token { get; private set; }
 
-    [JsonProperty("canvas")] internal Canvas Canvas { get; set; }
-
     [JsonProperty("s3")] internal S3 S3 { get; set; }
 
     [JsonProperty("shortLinks")] internal ShortLinks ShortLinks { get; set; }
-}
-
-internal class Canvas
-{
-    [JsonProperty("apiToken")] internal string ApiToken { get; private set; }
-    
-    [JsonProperty("domain")] internal string Domain { get; private set; }
 }
 
 internal class S3
