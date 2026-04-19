@@ -9,7 +9,8 @@ internal static class State
 
     internal static class Caches
     {
-        public static readonly Dictionary<ulong, CancellationTokenSource> CancellationTokens = [];
+        internal static readonly Dictionary<ulong, CancellationTokenSource> CancellationTokens = [];
+        internal static readonly Dictionary<ulong, Eval.Selection> Selections = [];
     }
 
     internal static IMinioClient Minio = new MinioClient()

@@ -41,13 +41,13 @@ internal static class Program
             // Register commands
             var commandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t =>
                 t.IsClass && t.Namespace is not null && t.Namespace.Contains("Azusa.Commands") &&
-                !t.IsNested).ToList();
+                !t.IsNested && t != typeof(Commands.SelectCommands)).ToList();
+            extension.AddCommands(commandTypes, 799644062973427743);
+            extension.AddCommands(typeof(Commands.SelectCommands));
 
             extension.CommandErrored += Errors.CommandErrors.HandleCommandErroredEventAsync;
 
             extension.AddCheck<SecretContextCheck>();
-
-            extension.AddCommands(commandTypes, 799644062973427743);
 
             TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
             {
@@ -67,6 +67,8 @@ internal static class Program
         await Setup.State.Discord.Client.ConnectAsync();
 
         Setup.Constants.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Azusa (contact https://floatingmilkshake.com)");
+
+        await Task.Run(async () => Tasks.CleanupTasks.ExecuteAsync());
 
         await Task.Delay(Timeout.InfiniteTimeSpan);
     }
