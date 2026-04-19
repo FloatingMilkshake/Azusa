@@ -2,5 +2,5 @@
 
 internal static class Configuration
 {
-    internal static ConfigJson ConfigJson;
+    internal static Setup.Types.ConfigJson ConfigJson;
 }

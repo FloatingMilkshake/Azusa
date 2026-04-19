@@ -5,7 +5,7 @@ internal static class Program
     internal static async Task Main()
     {
         // Read config.json
-        Setup.Configuration.ConfigJson = JsonConvert.DeserializeObject<ConfigJson>(await File.ReadAllTextAsync("config.json"));
+        Setup.Configuration.ConfigJson = JsonConvert.DeserializeObject<Setup.Types.ConfigJson>(await File.ReadAllTextAsync("config.json"));
 
         if (Setup.Configuration.ConfigJson is null)
         {
