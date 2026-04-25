@@ -10,7 +10,7 @@ public static class Eval
         "Azusa", "Azusa.Setup.Eval", "Azusa.Setup.Eval.Utilities"
     ];
 
-    public class Selection
+    public sealed class Selection
     {
         public DiscordUser User { get; private set; }
         public DiscordMessage Message { get; private set; }
@@ -31,7 +31,7 @@ public static class Eval
         }
     }
 
-    public class Globals
+    public sealed class Globals
     {
         internal Globals(DiscordClient client, TextCommandContext ctx, CancellationToken cancellationToken)
         {

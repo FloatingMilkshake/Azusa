@@ -4,16 +4,27 @@ internal static class Program
 {
     internal static async Task Main()
     {
-        // Read config.json
-        Setup.Configuration.ConfigJson = JsonConvert.DeserializeObject<Setup.Types.ConfigJson>(await File.ReadAllTextAsync("config.json"));
+        #region read config.json
+        Setup.State.Process.Configuration = JsonConvert.DeserializeObject<Setup.Types.ConfigJson>(await File.ReadAllTextAsync("config.json"));
 
-        if (Setup.Configuration.ConfigJson is null)
+        if (Setup.State.Process.Configuration is null)
         {
             Console.WriteLine("config.json is malformed. Please be sure it has all of the required values.");
             Environment.Exit(1);
         }
+        #endregion read config.json
 
-        var clientBuilder = DiscordClientBuilder.CreateDefault(Setup.Configuration.ConfigJson.Token, DiscordIntents.All);
+        #region set up Minio
+        Setup.State.Process.Minio = new MinioClient()
+            .WithEndpoint(Setup.State.Process.Configuration.S3.Endpoint)
+            .WithCredentials(Setup.State.Process.Configuration.S3.AccessKey, Setup.State.Process.Configuration.S3.SecretKey)
+            .WithRegion(Setup.State.Process.Configuration.S3.Region)
+            .WithSSL()
+            .Build();
+        #endregion set up Minio
+
+        #region build Discord client
+        var clientBuilder = DiscordClientBuilder.CreateDefault(Setup.State.Process.Configuration.Token, DiscordIntents.All);
 #if DEBUG
         clientBuilder.SetLogLevel(LogLevel.Debug);
 #else
@@ -38,7 +49,6 @@ internal static class Program
         });
         clientBuilder.UseCommands((_, extension) =>
         {
-            // Register commands
             var commandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t =>
                 t.IsClass && t.Namespace is not null && t.Namespace.Contains("Azusa.Commands") &&
                 !t.IsNested && t != typeof(Commands.SelectCommands)).ToList();
@@ -63,6 +73,7 @@ internal static class Program
             UseDefaultCommandErrorHandler = false,
         });
         Setup.State.Discord.Client = clientBuilder.Build();
+        #endregion build Discord client
 
         await Setup.State.Discord.Client.ConnectAsync();
 

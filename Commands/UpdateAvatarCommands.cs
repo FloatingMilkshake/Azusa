@@ -17,13 +17,13 @@ internal class UpdateAvatarCommands
             MemoryStream memStream = new(await Setup.Constants.HttpClient.GetByteArrayAsync(ctx.User.AvatarUrl));
 
             var args = new PutObjectArgs()
-                .WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
+                .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
                 .WithObject("avatar.png")
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
                 .WithContentType("image/png");
 
-            await Setup.State.Minio.PutObjectAsync(args);
+            await Setup.State.Process.Minio.PutObjectAsync(args);
 
             string tmpAvatarPath = RuntimeInformation.OSDescription.Contains("Windows")
                 ? $"{Path.GetTempPath()}\\avatar.png"
@@ -38,13 +38,13 @@ internal class UpdateAvatarCommands
 
             memStream = new(await File.ReadAllBytesAsync(tmpFaviconPath));
             args = new PutObjectArgs()
-                .WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
+                .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
                 .WithObject("favicon.png")
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
                 .WithContentType("image/png");
 
-            await Setup.State.Minio.PutObjectAsync(args);
+            await Setup.State.Process.Minio.PutObjectAsync(args);
 
             File.Delete(tmpAvatarPath);
             File.Delete(tmpFaviconPath);
@@ -63,15 +63,15 @@ internal class UpdateAvatarCommands
         // This code is (mostly) taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L113.
         // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/1f32e03/src/Modules/Owner.cs#L232)
 
-        Setup.Types.CloudflareContent content = new([Setup.Configuration.ConfigJson.S3.UrlPrefix + "avatar.png", Setup.Configuration.ConfigJson.S3.UrlPrefix + "favicon.png"]);
+        Setup.Types.CloudflareContent content = new([Setup.State.Process.Configuration.S3.UrlPrefix + "avatar.png", Setup.State.Process.Configuration.S3.UrlPrefix + "favicon.png"]);
         var cloudflareContentString = JsonConvert.SerializeObject(content);
         bool wasCloudflareCachePurged = false;
         string cloudflareCachePurgeStatusCode = default;
         try
         {
-            using HttpRequestMessage request = new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.Configuration.ConfigJson.S3.ZoneId}/purge_cache/files");
+            using HttpRequestMessage request = new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.State.Process.Configuration.S3.ZoneId}/purge_cache/files");
             request.Content = new StringContent(cloudflareContentString, Encoding.UTF8, "application/json");
-            request.Headers.Add("Authorization", $"Bearer {Setup.Configuration.ConfigJson.S3.Token}");
+            request.Headers.Add("Authorization", $"Bearer {Setup.State.Process.Configuration.S3.Token}");
 
             var cachePurgeResponse = await Setup.Constants.HttpClient.SendAsync(request);
             var responseText = await cachePurgeResponse.Content.ReadAsStringAsync();

@@ -43,7 +43,7 @@ internal static class CdnCommands
 
         try
         {
-            var bucket = Setup.Configuration.ConfigJson.S3.Bucket;
+            var bucket = Setup.State.Process.Configuration.S3.Bucket;
 
             // Strip the URL down to just the file name
 
@@ -82,7 +82,7 @@ internal static class CdnCommands
                 .WithObjectSize(memStream.Length)
                 .WithContentType(mimeType);
 
-            await Setup.State.Minio.PutObjectAsync(args);
+            await Setup.State.Process.Minio.PutObjectAsync(args);
         }
         catch (MinioException e)
         {
@@ -95,7 +95,7 @@ internal static class CdnCommands
             return;
         }
 
-        await ctx.RespondAsync($"Upload successful!\n<{Setup.Configuration.ConfigJson.S3.BaseUrl}/{fileName}>");
+        await ctx.RespondAsync($"Upload successful!\n<{Setup.State.Process.Configuration.S3.BaseUrl}/{fileName}>");
     }
 
     [Command("delete")]
@@ -107,15 +107,15 @@ internal static class CdnCommands
     {
         fileToDelete = fileToDelete.Replace("<", "").Replace(">", "");
 
-        var fileName = fileToDelete.Replace($"{Setup.Configuration.ConfigJson.S3.BaseUrl}/", "");
+        var fileName = fileToDelete.Replace($"{Setup.State.Process.Configuration.S3.BaseUrl}/", "");
 
         try
         {
             var args = new RemoveObjectArgs()
-                .WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
+                .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
                 .WithObject(fileName);
 
-            await Setup.State.Minio.RemoveObjectAsync(args);
+            await Setup.State.Process.Minio.RemoveObjectAsync(args);
         }
         catch (MinioException e)
         {
@@ -130,7 +130,7 @@ internal static class CdnCommands
 
         await ctx.RespondAsync("File deleted successfully!\nAttempting to purge Cloudflare cache...");
 
-        var cloudflareUrlPrefix = Setup.Configuration.ConfigJson.S3.UrlPrefix;
+        var cloudflareUrlPrefix = Setup.State.Process.Configuration.S3.UrlPrefix;
 
         // This code is (mostly) taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L113.
         // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/1f32e03/src/Modules/Owner.cs#L232)
@@ -140,9 +140,9 @@ internal static class CdnCommands
         try
         {
             using HttpRequestMessage request =
-                new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.Configuration.ConfigJson.S3.ZoneId}/purge_cache/files");
+                new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.State.Process.Configuration.S3.ZoneId}/purge_cache/files");
             request.Content = new StringContent(cloudflareContentString, Encoding.UTF8, "application/json");
-            request.Headers.Add("Authorization", $"Bearer {Setup.Configuration.ConfigJson.S3.Token}");
+            request.Headers.Add("Authorization", $"Bearer {Setup.State.Process.Configuration.S3.Token}");
 
             var response = await Setup.Constants.HttpClient.SendAsync(request);
             var responseText = await response.Content.ReadAsStringAsync();
@@ -166,12 +166,12 @@ internal static class CdnCommands
         [Parameter("name")] [Description("The name (or link) of the file to check.")]
         string name)
     {
-        if (name.Contains(Setup.Configuration.ConfigJson.S3.BaseUrl))
-            name = name.Replace(Setup.Configuration.ConfigJson.S3.BaseUrl, "").Trim('/');
+        if (name.Contains(Setup.State.Process.Configuration.S3.BaseUrl))
+            name = name.Replace(Setup.State.Process.Configuration.S3.BaseUrl, "").Trim('/');
 
         try
         {
-            await Setup.State.Minio.GetObjectAsync(new GetObjectArgs().WithBucket(Setup.Configuration.ConfigJson.S3.Bucket)
+            await Setup.State.Process.Minio.GetObjectAsync(new GetObjectArgs().WithBucket(Setup.State.Process.Configuration.S3.Bucket)
                 .WithObject(name).WithFile(name));
         }
         catch (ObjectNotFoundException)
