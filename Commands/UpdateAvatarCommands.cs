@@ -18,7 +18,11 @@ internal class UpdateAvatarCommands
 
             var args = new PutObjectArgs()
                 .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
-                .WithObject("avatar.png")
+#if DEBUG
+                .WithObject("cdn/test_avatar.png")
+#else
+                .WithObject("cdn/avatar.png")
+#endif
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
                 .WithContentType("image/png");
@@ -39,7 +43,11 @@ internal class UpdateAvatarCommands
             memStream = new(await File.ReadAllBytesAsync(tmpFaviconPath));
             args = new PutObjectArgs()
                 .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
-                .WithObject("favicon.png")
+#if DEBUG
+                .WithObject("cdn/test_favicon.png")
+#else
+                .WithObject("cdn/favicon.png")
+#endif
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
                 .WithContentType("image/png");
@@ -60,39 +68,8 @@ internal class UpdateAvatarCommands
             return;
         }
 
-        // This code is (mostly) taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L113.
-        // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/1f32e03/src/Modules/Owner.cs#L232)
-
-        Setup.Types.CloudflareContent content = new([Setup.State.Process.Configuration.S3.UrlPrefix + "avatar.png", Setup.State.Process.Configuration.S3.UrlPrefix + "favicon.png"]);
-        var cloudflareContentString = JsonConvert.SerializeObject(content);
-        bool wasCloudflareCachePurged = false;
-        string cloudflareCachePurgeStatusCode = default;
-        try
-        {
-            using HttpRequestMessage request = new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.State.Process.Configuration.S3.ZoneId}/purge_cache/files");
-            request.Content = new StringContent(cloudflareContentString, Encoding.UTF8, "application/json");
-            request.Headers.Add("Authorization", $"Bearer {Setup.State.Process.Configuration.S3.Token}");
-
-            var cachePurgeResponse = await Setup.Constants.HttpClient.SendAsync(request);
-            var responseText = await cachePurgeResponse.Content.ReadAsStringAsync();
-
-            if (cachePurgeResponse.IsSuccessStatusCode)
-                wasCloudflareCachePurged = true;
-            else
-                cloudflareCachePurgeStatusCode = $"{(int)cachePurgeResponse.StatusCode}: {cachePurgeResponse.ReasonPhrase}";
-        }
-        catch (Exception e)
-        {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"File deleted successfully!\nAn unexpected error occured when purging Cloudflare cache: ```json\n{e.Message}```"));
-        }
-
         var msg = await ctx.GetResponseAsync();
-        string response;
-        if (wasCloudflareCachePurged)
-            response = "Successfully updated avatar and purged Cloudflare cache!";
-        else
-            response = $"Successfully updated avatar!\nFailed to purge Cloudflare cache: `{cloudflareCachePurgeStatusCode}`";
+        string response = "Successfully updated avatar!";
         if (!wasFaviconCreated)
             response += "\nFailed to update favicon!";
         await msg.ModifyAsync(response);

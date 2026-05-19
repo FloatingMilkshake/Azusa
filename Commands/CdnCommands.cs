@@ -1,13 +1,13 @@
 ﻿namespace Azusa.Commands;
 
 [Command("cdn")]
-[Description("Manage files uploaded to R2.")]
+[Description("Manage files uploaded to B2.")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [RequireApplicationOwner]
 internal static class CdnCommands
 {
     [Command("upload")]
-    [Description("Upload a file to R2. An uploaded file attachment will override the `link` argument!")]
+    [Description("Upload a file to B2. An uploaded file attachment will override the `link` argument!")]
     [TextAlias("up", "u")]
     public static async Task CdnUploadCommandAsync(TextCommandContext ctx,
         [Parameter("name")] [Description("The name for the uploaded file.")]
@@ -77,7 +77,7 @@ internal static class CdnCommands
 
             var args = new PutObjectArgs()
                 .WithBucket(bucket)
-                .WithObject(fileName)
+                .WithObject("cdn/" + fileName)
                 .WithStreamData(memStream)
                 .WithObjectSize(memStream.Length)
                 .WithContentType(mimeType);
@@ -99,7 +99,7 @@ internal static class CdnCommands
     }
 
     [Command("delete")]
-    [Description("Delete a file from R2.")]
+    [Description("Delete a file from B2.")]
     [TextAlias("del", "d")]
     public static async Task CdnDeleteCommandAsync(TextCommandContext ctx,
         [Parameter("file")] [Description("The file to delete.")]
@@ -113,7 +113,7 @@ internal static class CdnCommands
         {
             var args = new RemoveObjectArgs()
                 .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
-                .WithObject(fileName);
+                .WithObject("cdn/" + fileName);
 
             await Setup.State.Process.Minio.RemoveObjectAsync(args);
         }
@@ -128,56 +128,21 @@ internal static class CdnCommands
             return;
         }
 
-        await ctx.RespondAsync("File deleted successfully!\nAttempting to purge Cloudflare cache...");
-
-        var cloudflareUrlPrefix = Setup.State.Process.Configuration.S3.UrlPrefix;
-
-        // This code is (mostly) taken from https://github.com/Sankra/cloudflare-cache-purger/blob/master/main.csx#L113.
-        // (Note that I originally found it here: https://github.com/Erisa/Lykos/blob/1f32e03/src/Modules/Owner.cs#L232)
-
-        Setup.Types.CloudflareContent content = new([cloudflareUrlPrefix + fileName]);
-        var cloudflareContentString = JsonConvert.SerializeObject(content);
-        try
-        {
-            using HttpRequestMessage request =
-                new(HttpMethod.Delete, $"https://api.cloudflare.com/client/v4/zones/{Setup.State.Process.Configuration.S3.ZoneId}/purge_cache/files");
-            request.Content = new StringContent(cloudflareContentString, Encoding.UTF8, "application/json");
-            request.Headers.Add("Authorization", $"Bearer {Setup.State.Process.Configuration.S3.Token}");
-
-            var response = await Setup.Constants.HttpClient.SendAsync(request);
-            var responseText = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
-                await ctx.EditResponseAsync("File deleted successfully!\nCloudflare cache purged!");
-            else
-                await ctx.EditResponseAsync($"File deleted successfully!\nAn API error occured when purging Cloudflare cache: ```json\n{responseText}```");
-        }
-        catch (Exception e)
-        {
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
-                $"File deleted successfully!\nAn unexpected error occured when purging Cloudflare cache: ```json\n{e.Message}```"));
-        }
+        await ctx.RespondAsync("File deleted successfully!");
     }
 
     [Command("check")]
-    [Description("Check whether a file exists in the R2 bucket. Uses the R2 API to avoid caching.")]
+    [Description("Check whether a file exists.")]
     [TextAlias("c")]
     public static async Task CdnPreviewCommandAsync(TextCommandContext ctx,
         [Parameter("name")] [Description("The name (or link) of the file to check.")]
         string name)
     {
-        if (name.Contains(Setup.State.Process.Configuration.S3.BaseUrl))
-            name = name.Replace(Setup.State.Process.Configuration.S3.BaseUrl, "").Trim('/');
-
+        HttpStatusCode status;
         try
         {
-            await Setup.State.Process.Minio.GetObjectAsync(new GetObjectArgs().WithBucket(Setup.State.Process.Configuration.S3.Bucket)
-                .WithObject(name).WithFile(name));
-        }
-        catch (ObjectNotFoundException)
-        {
-            await ctx.RespondAsync("That file doesn't exist!");
-            return;
+            var response = await Setup.Constants.HttpClient.GetAsync($"{Setup.State.Process.Configuration.S3.BaseUrl}/{name}");
+            status = response.StatusCode;
         }
         catch (Exception ex)
         {
@@ -185,6 +150,11 @@ internal static class CdnCommands
             return;
         }
 
-        await ctx.RespondAsync("That file exists!");
+        if (status == HttpStatusCode.OK)
+            await ctx.RespondAsync("That file exists!");
+        else if (status == HttpStatusCode.NotFound)
+            await ctx.RespondAsync("That file doesn't exist!");
+        else
+            await ctx.RespondAsync($"Unexpected status code: {status}");
     }
 }
