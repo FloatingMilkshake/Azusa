@@ -16,10 +16,11 @@ internal static class MessageEvents
             "jellyfin",
             "monitorss",
             "uptime-kuma",
-	        "immich",
+	    "immich",
             "pocket-id",
             "pi-hole",
-            "caddy"
+            "caddy",
+	    "veracrypt"
         ];
 
         // MonitoRSS only
