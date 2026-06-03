@@ -116,6 +116,8 @@ internal static class HelpCommands
                 helpEmbed.AddField("Subcommands", cmdList.TrimEnd(',', ' '));
                 //helpBuilder.WithSubcommands(eligibleCommands.OrderBy(xc => xc.Name));
             }
+
+            helpEmbed.WithFooter(text: $"Who can use this: {GetCommandPermissions(cmd)}");
         }
         else
         {
@@ -173,5 +175,19 @@ internal static class HelpCommands
         }
 
         return failedChecks;
+    }
+
+    private static string GetCommandPermissions(Command command)
+    {
+        var requireOwnerAttribute = command.Attributes.FirstOrDefault(x => x is RequireApplicationOwnerAttribute);
+        var secretAttribute = command.Attributes.FirstOrDefault(x => x is SecretAttribute);
+
+        if (requireOwnerAttribute != default)
+            return "Only Milkshake";
+
+        if (secretAttribute != default)
+            return "㊙️";
+
+        return "Everyone";
     }
 }
