@@ -24,15 +24,23 @@ internal class NoteSearchCommands
 
         List<DiscordMessage> matchingMessages = [];
 
-        foreach (var subChannel in noteChannels)
+        List<DiscordChannel> failedChannels = [];
+        foreach (var subChannel in noteChannels.Where(x => x.Id != 1500717100874862653))
         {
-            var messages = await subChannel.GetMessagesAsync().ToListAsync();
-            matchingMessages.AddRange(messages.Where(message =>
-                queryWords.All(word =>
-                    message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
-                    (message.MessageSnapshots is not null &&
-                    message.MessageSnapshots.Any(snapshot => snapshot.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))))
-            ));
+            try
+            {
+                var messages = await subChannel.GetMessagesAsync().ToListAsync();
+                matchingMessages.AddRange(messages.Where(message =>
+                    queryWords.All(word =>
+                        message.Content.Contains(word, StringComparison.OrdinalIgnoreCase) ||
+                        (message.MessageSnapshots is not null &&
+                        message.MessageSnapshots.Any(snapshot => snapshot.Message.Content.Contains(word, StringComparison.OrdinalIgnoreCase))))
+                ));
+            }
+            catch (UnauthorizedException)
+            {
+                failedChannels.Add(subChannel);
+            }
         }
         await responseMessage.ModifyAsync("Searching... 100%");
 
@@ -40,10 +48,14 @@ internal class NoteSearchCommands
         if (matchingMessages.Count == 0)
         {
             output = "Sorry, I didn't find anything.";
+            if (failedChannels.Count > 0)
+                output += $"\n-# Failed to search {string.Join(", ", failedChannels.Select(x => x.Mention))}: Unauthorized";
         }
         else if (matchingMessages.Count == 1)
         {
             output = $"This might be what you're looking for... {matchingMessages.First().JumpLink}";
+            if (failedChannels.Count > 0)
+                output += $"\n-# Failed to search {string.Join(", ", failedChannels.Select(x => x.Mention))}: Unauthorized";
         }
         else
         {
@@ -52,6 +64,8 @@ internal class NoteSearchCommands
             {
                 output += $"\n{message.JumpLink}";
             }
+            if (failedChannels.Count > 0)
+                output += $"\n-# Failed to search {string.Join(", ", failedChannels.Select(x => x.Mention))} : Unauthorized";
         }
 
         await responseMessage.ModifyAsync(output);
