@@ -66,6 +66,8 @@ internal static class SandboxCommands
         var sandbox = await ctx.Client.GetChannelAsync(SandboxChannelId);
         await sandbox.DeleteOverwriteAsync(role, reason: $"Sandbox access denied by {ctx.User.Username}");
         await ctx.RespondAsync("Done!");
+
+        await Setup.Storage.Redis.HashDeleteAsync("sandbox", role.Id.ToString());
     }
 
     [Command("reset")]
@@ -81,6 +83,7 @@ internal static class SandboxCommands
         foreach (var overwrite in overwrites)
         {
             await sandbox.DeleteOverwriteAsync(await overwrite.GetRoleAsync(), reason: $"Sandbox reset by {ctx.User.Username}");
+            await Setup.Storage.Redis.HashDeleteAsync("sandbox", overwrite.Id.ToString());
         }
         await ctx.RespondAsync("Done!");
     }
