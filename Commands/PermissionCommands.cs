@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Azusa.Commands;
 
 internal class PermissionCommands
