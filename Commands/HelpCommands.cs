@@ -180,12 +180,12 @@ internal static class HelpCommands
     private static string GetCommandPermissions(Command command)
     {
         var requireOwnerAttribute = command.Attributes.FirstOrDefault(x => x is RequireApplicationOwnerAttribute);
-        var secretAttribute = command.Attributes.FirstOrDefault(x => x is SecretAttribute);
+        var requireSecretRoleAttribute = command.Attributes.FirstOrDefault(x => x is RequireSecretRoleAttribute);
 
         if (requireOwnerAttribute != default)
             return "Only Milkshake";
 
-        if (secretAttribute != default)
+        if (requireSecretRoleAttribute != default)
             return "㊙️";
 
         return "Everyone";

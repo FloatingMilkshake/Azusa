@@ -5,7 +5,7 @@ internal class PanicCommands
     [Command("panic")]
     [Description("You know what this is for.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
-    [Secret]
+    [RequireSecretRole]
     public static async Task PanicCommandAsync(TextCommandContext ctx,
         [Parameter("who"), Description("You should ignore this if you're not milkshake.")] string who = "")
     {
