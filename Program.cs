@@ -58,6 +58,7 @@ internal static class Program
             extension.CommandErrored += Errors.CommandErrors.HandleCommandErroredEventAsync;
 
             extension.AddCheck<RequireSecretRoleContextCheck>();
+            extension.AddCheck<RequireCatRoleContextCheck>();
 
             TextCommandProcessor textCommandProcessor = new(new TextCommandConfiguration
             {
