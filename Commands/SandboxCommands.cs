@@ -41,6 +41,8 @@ internal static class SandboxCommands
         var sandbox = await ctx.Client.GetChannelAsync(SandboxChannelId);
         await sandbox.AddOverwriteAsync(role, new DiscordPermissions(permissionInteger), reason: $"Sandbox access granted by {ctx.User.Username}");
         await ctx.RespondAsync("Done!");
+
+        await Setup.Storage.Redis.HashSetAsync("sandbox", role.Id.ToString(), JsonConvert.SerializeObject(DateTime.UtcNow));
     }
 
     [Command("deny")]
