@@ -11,7 +11,7 @@ internal static class ErrorCommands
         [Parameter("code"), Description("The error code to look up.")] string code)
     {
         var response = await Setup.Constants.HttpClient.GetAsync($"https://err.milkshake.services?code={code}");
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound)
         {
             var result = (await response.Content.ReadAsStringAsync())
             .Replace("<pre>", "").Replace("</pre>", "");
