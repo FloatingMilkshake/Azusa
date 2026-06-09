@@ -14,7 +14,7 @@ internal static class CommandErrors
         var context = e.Context.As<TextCommandContext>();
 
         if (e.Exception is ChecksFailedException checksFailedException &&
-            checksFailedException.Errors.Any(x => x.ContextCheckAttribute is RequireApplicationOwnerAttribute or RequirePermissionsAttribute or RequireSecretRoleAttribute))
+            checksFailedException.Errors.Any(x => x.ContextCheckAttribute is RequireApplicationOwnerAttribute or RequirePermissionsAttribute or RequireCatRoleAttribute or RequireSecretRoleAttribute))
         {
             await context.RespondAsync("Sorry, you aren't allowed to use this command! If you think you should be able to, please ask Milkshake.");
             return;
