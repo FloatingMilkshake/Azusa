@@ -51,10 +51,12 @@ internal static class ShellCommand
             error = "";
         }
         if (cancellationToken.IsCancellationRequested)
+        {
             proc.Kill();
 
-        // Wait a bit for the process to be killed
-        await Task.Delay(5000, CancellationToken.None);
+            // Wait a bit for the process to be killed
+            await Task.Delay(5000, CancellationToken.None);
+        }
 
         return new Result(proc.ExitCode, result, error);
     }
