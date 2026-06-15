@@ -12,15 +12,13 @@ internal static class MessageEvents
         List<string> matches = [
             "node_exporter",
             "forgejo",
-            "tubearchivist",
             "jellyfin",
             "monitorss",
             "uptime-kuma",
-	    "immich",
             "pocket-id",
             "pi-hole",
             "caddy",
-	    "veracrypt"
+            "veracrypt"
         ];
 
         // MonitoRSS only
