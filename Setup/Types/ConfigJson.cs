@@ -10,23 +10,7 @@ internal sealed class ConfigJson
 
     internal class S3Configuration
     {
-        [JsonProperty("accessKey")] internal string AccessKey { get; set; }
-
         [JsonProperty("baseUrl")] internal string BaseUrl { get; set; }
-
-        [JsonProperty("bucket")] internal string Bucket { get; set; }
-
-        [JsonProperty("endpoint")] internal string Endpoint { get; set; }
-
-        [JsonProperty("region")] internal string Region { get; set; }
-
-        [JsonProperty("secretKey")] internal string SecretKey { get; set; }
-
-        [JsonProperty("token")] internal string Token { get; set; }
-
-        [JsonProperty("urlPrefix")] internal string UrlPrefix { get; set; }
-
-        [JsonProperty("zoneId")] internal string ZoneId { get; set; }
     }
 
     internal class ShortLinksConfiguration

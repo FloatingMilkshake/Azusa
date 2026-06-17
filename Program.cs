@@ -14,15 +14,6 @@ internal static class Program
         }
         #endregion read config.json
 
-        #region set up Minio
-        Setup.State.Process.Minio = new MinioClient()
-            .WithEndpoint(Setup.State.Process.Configuration.S3.Endpoint)
-            .WithCredentials(Setup.State.Process.Configuration.S3.AccessKey, Setup.State.Process.Configuration.S3.SecretKey)
-            .WithRegion(Setup.State.Process.Configuration.S3.Region)
-            .WithSSL()
-            .Build();
-        #endregion set up Minio
-
         #region build Discord client
         var clientBuilder = DiscordClientBuilder.CreateDefault(Setup.State.Process.Configuration.Token, DiscordIntents.All);
 #if DEBUG

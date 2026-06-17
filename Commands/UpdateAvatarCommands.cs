@@ -11,23 +11,35 @@ internal class UpdateAvatarCommands
     {
         await ctx.RespondAsync("Working on it...");
 
+        string response = "";
+
         bool wasFaviconCreated;
         try
         {
+#if DEBUG
+            string fileName = "test_avatar.png";
+#else
+            string fileName = "avatar.png";
+#endif
+
             MemoryStream memStream = new(await Setup.Constants.HttpClient.GetByteArrayAsync(ctx.User.AvatarUrl));
 
-            var args = new PutObjectArgs()
-                .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
-#if DEBUG
-                .WithObject("cdn/test_avatar.png")
-#else
-                .WithObject("cdn/avatar.png")
-#endif
-                .WithStreamData(memStream)
-                .WithObjectSize(memStream.Length)
-                .WithContentType("image/png");
+            var result = await Setup.Types.ShellCommand.RunAsync($"rclone rcat fs-crypt:/cdn/{fileName}", CancellationToken.None, memStream);
 
-            await Setup.State.Process.Minio.PutObjectAsync(args);
+            if (result.ExitCode == 0)
+            {
+                response += $"Avatar updated successfully!";
+            }
+            else
+            {
+                response += $"Avatar update failed with exit code {result.ExitCode}! Error: {result.Error}";
+            }
+
+#if DEBUG
+            fileName = "test_favicon.png";
+#else
+            fileName = "favicon.png";
+#endif
 
             string tmpAvatarPath = RuntimeInformation.OSDescription.Contains("Windows")
                 ? $"{Path.GetTempPath()}\\avatar.png"
@@ -41,37 +53,28 @@ internal class UpdateAvatarCommands
             wasFaviconCreated = true;
 
             memStream = new(await File.ReadAllBytesAsync(tmpFaviconPath));
-            args = new PutObjectArgs()
-                .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
-#if DEBUG
-                .WithObject("cdn/test_favicon.png")
-#else
-                .WithObject("cdn/favicon.png")
-#endif
-                .WithStreamData(memStream)
-                .WithObjectSize(memStream.Length)
-                .WithContentType("image/png");
 
-            await Setup.State.Process.Minio.PutObjectAsync(args);
+            result = await Setup.Types.ShellCommand.RunAsync($"rclone rcat fs-crypt:/cdn/{fileName}", CancellationToken.None, memStream);
+
+            if (result.ExitCode == 0)
+            {
+                response += $"\nFavicon updated successfully!";
+            }
+            else
+            {
+                response += $"\nFavicon update failed with exit code {result.ExitCode}! Error: {result.Error}";
+            }
 
             File.Delete(tmpAvatarPath);
             File.Delete(tmpFaviconPath);
-        }
-        catch (MinioException e)
-        {
-            await ctx.RespondAsync($"An API error occured while uploading! `{e.GetType()}: {e.Message}`");
-            return;
+
+            var msg = await ctx.GetResponseAsync();
+            await msg.ModifyAsync(response);
         }
         catch (Exception e)
         {
             await ctx.RespondAsync($"An unexpected error occured while uploading! `{e.GetType()}: {e.Message}`");
             return;
         }
-
-        var msg = await ctx.GetResponseAsync();
-        string response = "Successfully updated avatar!";
-        if (!wasFaviconCreated)
-            response += "\nFailed to update favicon!";
-        await msg.ModifyAsync(response);
     }
 }

@@ -8,6 +8,6 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine
 LABEL com.centurylinklabs.watchtower.enable="true"
 WORKDIR /app
 COPY --from=build-env /app/out .
-RUN apk add redis icu-libs iputils-ping imagemagick --no-cache
+RUN apk add redis icu-libs iputils-ping imagemagick rclone --no-cache
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENTRYPOINT ["dotnet", "Azusa.dll"]

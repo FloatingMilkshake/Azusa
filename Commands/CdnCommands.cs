@@ -1,13 +1,13 @@
 ﻿namespace Azusa.Commands;
 
 [Command("cdn")]
-[Description("Manage files uploaded to B2.")]
+[Description("Manage files uploaded to object storage.")]
 [AllowedProcessors(typeof(TextCommandProcessor))]
 [RequireApplicationOwner]
 internal static class CdnCommands
 {
     [Command("upload")]
-    [Description("Upload a file to B2. An uploaded file attachment will override the `link` argument!")]
+    [Description("Upload a file to object storage. An uploaded file attachment will override the `link` argument!")]
     [TextAlias("up", "u")]
     public static async Task CdnUploadCommandAsync(TextCommandContext ctx,
         [Parameter("name")] [Description("The name for the uploaded file.")]
@@ -43,8 +43,6 @@ internal static class CdnCommands
 
         try
         {
-            var bucket = Setup.State.Process.Configuration.S3.Bucket;
-
             // Strip the URL down to just the file name
 
             var fileNameAndExtension = Setup.Constants.RegularExpressions.CdnFileNamePattern.Match(link ?? "").Value;
@@ -70,36 +68,27 @@ internal static class CdnCommands
                 "preserve" => fileNameAndExtension,
                 _ => name + extension
             };
-            
-            var mimeType = MimeTypeMap.GetMimeType(extension);
-            if (mimeType == "application/octet-stream")
-                mimeType = null;
 
-            var args = new PutObjectArgs()
-                .WithBucket(bucket)
-                .WithObject("cdn/" + fileName)
-                .WithStreamData(memStream)
-                .WithObjectSize(memStream.Length)
-                .WithContentType(mimeType);
+            var result = await Setup.Types.ShellCommand.RunAsync($"rclone -vv rcat fs-crypt:/cdn/{fileName}", CancellationToken.None, memStream);
 
-            await Setup.State.Process.Minio.PutObjectAsync(args);
-        }
-        catch (MinioException e)
-        {
-            await ctx.RespondAsync($"An API error occured while uploading! `{e.GetType()}: {e.Message}`");
-            return;
+            if (result.ExitCode == 0)
+            {
+                await ctx.RespondAsync($"Upload successful!\n<{Setup.State.Process.Configuration.S3.BaseUrl}/{fileName}>");
+            }
+            else
+            {
+                await ctx.RespondAsync($"Upload failed with exit code {result.ExitCode}! Error: {result.Error}");
+            }
         }
         catch (Exception e)
         {
             await ctx.RespondAsync($"An unexpected error occured while uploading! `{e.GetType()}: {e.Message}`");
             return;
         }
-
-        await ctx.RespondAsync($"Upload successful!\n<{Setup.State.Process.Configuration.S3.BaseUrl}/{fileName}>");
     }
 
     [Command("delete")]
-    [Description("Delete a file from B2.")]
+    [Description("Delete a file from object storage.")]
     [TextAlias("del", "d")]
     public static async Task CdnDeleteCommandAsync(TextCommandContext ctx,
         [Parameter("file")] [Description("The file to delete.")]
@@ -111,50 +100,57 @@ internal static class CdnCommands
 
         try
         {
-            var args = new RemoveObjectArgs()
-                .WithBucket(Setup.State.Process.Configuration.S3.Bucket)
-                .WithObject("cdn/" + fileName);
+            var result = await Setup.Types.ShellCommand.RunAsync($"rclone deletefile fs-crypt:/cdn/{fileName}", CancellationToken.None);
 
-            await Setup.State.Process.Minio.RemoveObjectAsync(args);
-        }
-        catch (MinioException e)
-        {
-            await ctx.RespondAsync($"An API error occured while attempting to delete the file!```\n{e.Message}```");
-            return;
+            if (result.ExitCode == 0)
+            {
+                await ctx.RespondAsync("File deleted successfully!");
+            }
+            else
+            {
+                await ctx.RespondAsync($"Deletion failed with exit code {result.ExitCode}! Error: {result.Error}");
+            }
         }
         catch (Exception e)
         {
             await ctx.RespondAsync($"An unexpected error occured while attempting to delete the file!```\n{e.Message}```");
             return;
         }
-
-        await ctx.RespondAsync("File deleted successfully!");
     }
 
     [Command("check")]
     [Description("Check whether a file exists.")]
     [TextAlias("c")]
     public static async Task CdnPreviewCommandAsync(TextCommandContext ctx,
-        [Parameter("name")] [Description("The name (or link) of the file to check.")]
+        [Parameter("name")] [Description("The name of the file to check.")]
         string name)
     {
-        HttpStatusCode status;
+        name = name.Replace(Setup.State.Process.Configuration.S3.BaseUrl, "").Trim('/');
+
         try
         {
-            var response = await Setup.Constants.HttpClient.GetAsync($"{Setup.State.Process.Configuration.S3.BaseUrl}/{name}");
-            status = response.StatusCode;
+            var result = await Setup.Types.ShellCommand.RunAsync($"rclone ls fs-crypt:/cdn/{name}", CancellationToken.None);
+
+            if (result.ExitCode == 0)
+            {
+                if (string.IsNullOrWhiteSpace(result.Output))
+                {
+                    await ctx.RespondAsync("That file doesn't exist!");
+                }
+                else
+                {
+                    await ctx.RespondAsync("That file exists!");
+                }
+            }
+            else
+            {
+                await ctx.RespondAsync($"Check failed with exit code {result.ExitCode}! Error: {result.Error}");
+            }
         }
         catch (Exception ex)
         {
             await ctx.RespondAsync($"I ran into an error trying to check for that file! {ex.GetType()}: {ex.Message}");
             return;
         }
-
-        if (status == HttpStatusCode.OK)
-            await ctx.RespondAsync("That file exists!");
-        else if (status == HttpStatusCode.NotFound)
-            await ctx.RespondAsync("That file doesn't exist!");
-        else
-            await ctx.RespondAsync($"Unexpected status code: {status}");
     }
 }

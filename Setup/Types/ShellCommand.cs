@@ -2,7 +2,7 @@
 
 internal static class ShellCommand
 {
-    internal static async Task<Result> RunAsync(string command, CancellationToken cancellationToken)
+    internal static async Task<Result> RunAsync(string command, CancellationToken cancellationToken, MemoryStream memoryStream = default)
     {
         var osDescription = RuntimeInformation.OSDescription;
         string fileName;
@@ -12,7 +12,7 @@ internal static class ShellCommand
         if (osDescription.Contains("Windows"))
         {
             fileName = @"C:\Program Files\PowerShell\7\pwsh.exe";
-            args = $"-Command \"$PSStyle.OutputRendering = [System.Management.Automation.OutputRendering]::PlainText ; {escapedArgs} 2>&1\"";
+            args = $"-Command \"$PSStyle.OutputRendering = [System.Management.Automation.OutputRendering]::PlainText ; {escapedArgs}\"";
         }
         else
         {
@@ -23,27 +23,40 @@ internal static class ShellCommand
             args = $"-c \"{escapedArgs}\"";
         }
 
+        var startInfo = new ProcessStartInfo
+        {
+            FileName = fileName,
+            Arguments = args,
+            UseShellExecute = false,
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            RedirectStandardInput = true
+        };
+        startInfo.Environment.Remove("RCLONE_LOG_FILE");
         Process proc = new()
         {
-            StartInfo = new ProcessStartInfo
-            {
-                FileName = fileName,
-                Arguments = args,
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                RedirectStandardInput = true
-            }
+            StartInfo = startInfo
         };
 
         proc.Start();
+        Task<string> stdout;
+        Task<string> stderr;
         string result;
         string error;
         try
         {
-            result = await proc.StandardOutput.ReadToEndAsync(cancellationToken);
-            error = await proc.StandardOutput.ReadToEndAsync(cancellationToken);
+            if (memoryStream != default)
+            {
+                await memoryStream.CopyToAsync(proc.StandardInput.BaseStream);
+                proc.StandardInput.Close();
+            }
+            stdout = proc.StandardOutput.ReadToEndAsync(cancellationToken);
+            stderr = proc.StandardError.ReadToEndAsync(cancellationToken);
+
             await proc.WaitForExitAsync(cancellationToken);
+
+            result = await stdout;
+            error = await stderr;
         }
         catch (OperationCanceledException)
         {
