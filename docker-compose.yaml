@@ -10,6 +10,7 @@
       - type: bind
         source: ./config.json
         target: /app/config.json
+    env_file: .env
     labels: [ "com.centurylinklabs.watchtower.scope=azusa" ]
   redis:
     image: redis:alpine
