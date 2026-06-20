@@ -203,12 +203,20 @@ internal static class HelpCommands
         if (requireOwnerAttribute != default)
             return "Only Milkshake";
 
+        var result = "";
+
         if (requireCatRoleAttribute != default)
-            return "🐱";
+            result += "🐱";
+        else if (requireSecretRoleAttribute != default)
+            result += "㊙️";
+        else
+            result += "Anyone";
 
-        if (requireSecretRoleAttribute != default)
-            return "㊙️";
+        var requirePermissionsAttribute = command.Attributes.FirstOrDefault(x => x is RequirePermissionsAttribute) as RequirePermissionsAttribute;
 
-        return "Anyone";
+        if (requirePermissionsAttribute != default)
+            result += " with " + string.Join(" ", requirePermissionsAttribute.UserPermissions.Select(x => x.Humanize()));
+
+        return result;
     }
 }
