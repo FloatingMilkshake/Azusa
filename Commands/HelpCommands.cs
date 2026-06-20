@@ -117,7 +117,8 @@ internal static class HelpCommands
                 //helpBuilder.WithSubcommands(eligibleCommands.OrderBy(xc => xc.Name));
             }
 
-            helpEmbed.WithFooter(text: $"Who can use this: {GetCommandPermissions(cmd)}");
+            if (ctx.Guild is not null && ctx.Guild.Id == 799644062973427743)
+                helpEmbed.WithFooter(text: $"Who can use this: {GetCommandPermissions(cmd)}");
         }
         else
         {
@@ -157,6 +158,9 @@ internal static class HelpCommands
 
     private static List<ContextCheckAttribute> CheckPermissions(TextCommandContext ctx, Command command)
     {
+        if (Setup.State.Discord.Client.CurrentApplication.Owners.Contains(ctx.User))
+            return [];
+
         var contextChecks = command.Attributes.Where(x => x is ContextCheckAttribute);
         var failedChecks = new List<ContextCheckAttribute>();
 
@@ -169,19 +173,19 @@ internal static class HelpCommands
                     failedChecks.Add(requirePermissionsAttribute);
 
             if (check is RequireApplicationOwnerAttribute requireApplicationOwnerAttribute
-                && !Setup.State.Discord.Client.CurrentApplication.Owners.Any(x => x.Id == ctx.User.Id))
+                && !Setup.State.Discord.Client.CurrentApplication.Owners.Contains(ctx.User))
             {
                 failedChecks.Add(requireApplicationOwnerAttribute);
             }
 
             if (check is RequireCatRoleAttribute requireCatRoleAttribute
-                && ctx.Member.Roles.All(x => x.Name != "🐱"))
+                && (ctx.Guild is null || ctx.Member.Roles.All(x => x.Name != "🐱")))
             {
                 failedChecks.Add(requireCatRoleAttribute);
             }
 
             if (check is RequireSecretRoleAttribute requireSecretRoleAttribute
-                && ctx.Member.Roles.All(x => x.Name != "㊙️"))
+                && (ctx.Guild is null || ctx.Member.Roles.All(x => x.Name != "㊙️")))
             {
                 failedChecks.Add(requireSecretRoleAttribute);
             }
