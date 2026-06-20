@@ -43,7 +43,7 @@ internal static class Program
             var commandTypes = Assembly.GetExecutingAssembly().GetTypes().Where(t =>
                 t.IsClass && t.Namespace is not null && t.Namespace.Contains("Azusa.Commands") &&
                 !t.IsNested && t != typeof(Commands.SelectCommands)).ToList();
-            extension.AddCommands(commandTypes, 799644062973427743);
+            extension.AddCommands(commandTypes);
             extension.AddCommands(typeof(Commands.SelectCommands));
 
             extension.CommandErrored += Errors.CommandErrors.HandleCommandErroredEventAsync;
