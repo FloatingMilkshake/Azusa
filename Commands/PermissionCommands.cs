@@ -4,6 +4,7 @@ internal class PermissionCommands
 {
     [Command("convertpermissioninteger")]
     [TextAlias("convertpermissions", "permissioninteger", "convertperms", "permission", "perms")]
+    [Description("Show the permissions represented by a permission integer.")]
     [AllowedProcessors(typeof(TextCommandProcessor))]
     public static async Task ConvertPermissionIntegerCommandAsync(TextCommandContext ctx, string permissions)
     {
