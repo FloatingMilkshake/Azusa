@@ -168,10 +168,23 @@ internal static class HelpCommands
                                        || !ctx.Channel.PermissionsFor(ctx.Guild.CurrentMember).HasAllPermissions(requirePermissionsAttribute.BotPermissions))
                     failedChecks.Add(requirePermissionsAttribute);
 
-            if (check is RequireApplicationOwnerAttribute requireApplicationOwnerAttribute)
-                // null-forgiving here is fine because im the only one using this bot & its not in a team
-                if (!Setup.State.Discord.Client.CurrentApplication.Owners!.Any(x => x.Id == ctx.User.Id))
-                    failedChecks.Add(requireApplicationOwnerAttribute);
+            if (check is RequireApplicationOwnerAttribute requireApplicationOwnerAttribute
+                && !Setup.State.Discord.Client.CurrentApplication.Owners.Any(x => x.Id == ctx.User.Id))
+            {
+                failedChecks.Add(requireApplicationOwnerAttribute);
+            }
+
+            if (check is RequireCatRoleAttribute requireCatRoleAttribute
+                && ctx.Member.Roles.All(x => x.Name != "🐱"))
+            {
+                failedChecks.Add(requireCatRoleAttribute);
+            }
+
+            if (check is RequireSecretRoleAttribute requireSecretRoleAttribute
+                && ctx.Member.Roles.All(x => x.Name != "㊙️"))
+            {
+                failedChecks.Add(requireSecretRoleAttribute);
+            }
         }
 
         return failedChecks;
