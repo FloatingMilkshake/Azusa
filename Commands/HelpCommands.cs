@@ -205,6 +205,6 @@ internal static class HelpCommands
         if (requireSecretRoleAttribute != default)
             return "㊙️";
 
-        return "Everyone";
+        return "Anyone";
     }
 }
