@@ -14,20 +14,9 @@ internal static class PingCommands
         var rtt = (msg?.Id - ctx.Message.Id) >> 22 ?? 0;
         var ping = ctx.Client.GetConnectionLatency(0).TotalMilliseconds;
 
-        string redisLatency;
-        try
-        {
-            redisLatency = $"{(await Setup.Storage.Redis.PingAsync()).TotalMilliseconds}ms";
-        }
-        catch (Exception) // I don't know what specific exception this might throw?
-        {
-            redisLatency = "Unreachable!";
-        }
-        
         await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(
             $"Pong!\n"
             + $"Websocket `{ping}ms`\n"
-            + $"RTT `{rtt}ms`\n"
-            + $"Redis `{redisLatency}`"));
+            + $"RTT `{rtt}ms`"));
     }
 }
