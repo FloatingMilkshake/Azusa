@@ -13,7 +13,6 @@ internal class UpdateAvatarCommands
 
         string response = "";
 
-        bool wasFaviconCreated;
         try
         {
 #if DEBUG
@@ -50,7 +49,6 @@ internal class UpdateAvatarCommands
 
             await File.WriteAllBytesAsync(tmpAvatarPath, await Setup.Constants.HttpClient.GetByteArrayAsync(ctx.User.AvatarUrl));
             var magickResult = await Setup.Types.ShellCommand.RunAsync($"magick {tmpAvatarPath} -resize 192x192 {tmpFaviconPath}", CancellationToken.None);
-            wasFaviconCreated = true;
 
             memStream = new(await File.ReadAllBytesAsync(tmpFaviconPath));
 
