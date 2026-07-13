@@ -16,9 +16,13 @@ internal static class MessageEvents
             "monitorss",
             "uptime-kuma",
             "pocket-id",
-            "pi-hole",
+            "technitium",
             "caddy",
-            "veracrypt"
+            "anubis",
+            "sonarr",
+            "radarr",
+            "lidarr",
+            "prowlarr"
         ];
 
         // MonitoRSS only
