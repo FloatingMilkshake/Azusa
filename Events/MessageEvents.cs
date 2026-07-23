@@ -24,7 +24,8 @@ internal static class MessageEvents
             "lidarr",
             "prowlarr",
             "immich",
-            "koi"
+            "koi",
+	    "wivrn"
         ];
 
         // MonitoRSS only
