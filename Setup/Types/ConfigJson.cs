@@ -8,6 +8,8 @@ internal sealed class ConfigJson
 
     [JsonProperty("shortLinks")] internal ShortLinksConfiguration ShortLinks { get; set; }
 
+    [JsonProperty("grafanaLokiUrl")] internal string GrafanaLokiUrl { get; set; }
+
     internal class S3Configuration
     {
         [JsonProperty("baseUrl")] internal string BaseUrl { get; set; }

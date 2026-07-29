@@ -14,13 +14,32 @@ internal static class Program
         }
         #endregion read config.json
 
+        #region set up logging
+        var logConfig = new LoggerConfiguration().WriteTo.Console(theme: AnsiConsoleTheme.Sixteen).MinimumLevel.Override("System.Net.Http", Serilog.Events.LogEventLevel.Error);
+#if DEBUG
+        logConfig.MinimumLevel.Debug();
+#else
+        logConfig.MinimumLevel.Debug();
+#endif
+
+        if (Setup.State.Process.Configuration.GrafanaLokiUrl is not null)
+        {
+            var discordBot = "azusa";
+#if DEBUG
+            discordBot = "azusa_dev";
+#endif
+            logConfig.WriteTo.GrafanaLoki(Setup.State.Process.Configuration.GrafanaLokiUrl, [new LokiLabel { Key = "discord_bot", Value = discordBot }]);
+        }
+
+        Log.Logger = logConfig.CreateLogger();
+        #endregion set up logging
+
         #region build Discord client
         var clientBuilder = DiscordClientBuilder.CreateDefault(Setup.State.Process.Configuration.Token, DiscordIntents.All);
-#if DEBUG
-        clientBuilder.SetLogLevel(LogLevel.Debug);
-#else
-        clientBuilder.SetLogLevel(LogLevel.Information);
-#endif
+        clientBuilder.ConfigureLogging(config =>
+        {
+            config.AddSerilog();
+        });
         clientBuilder.ConfigureExtraFeatures(config =>
         {
             config.LogUnknownEvents = false;
