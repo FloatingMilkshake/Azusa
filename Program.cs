@@ -35,7 +35,7 @@ internal static class Program
         #endregion set up logging
 
         #region build Discord client
-        var clientBuilder = DiscordClientBuilder.CreateDefault(Setup.State.Process.Configuration.Token, DiscordIntents.All);
+        var clientBuilder = DiscordClientBuilder.CreateDefault(Environment.GetEnvironmentVariable("BOT_TOKEN"), DiscordIntents.All);
         clientBuilder.ConfigureLogging(config =>
         {
             config.AddSerilog();

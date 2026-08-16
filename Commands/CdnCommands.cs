@@ -73,7 +73,7 @@ internal static class CdnCommands
 
             if (result.ExitCode == 0)
             {
-                await ctx.RespondAsync($"Upload successful!\n<{Setup.State.Process.Configuration.S3.BaseUrl}/{fileName}>");
+                await ctx.RespondAsync($"Upload successful!\n<{Setup.State.Process.Configuration.S3BaseUrl}/{fileName}>");
             }
             else
             {
@@ -96,7 +96,7 @@ internal static class CdnCommands
     {
         fileToDelete = fileToDelete.Replace("<", "").Replace(">", "");
 
-        var fileName = fileToDelete.Replace($"{Setup.State.Process.Configuration.S3.BaseUrl}/", "");
+        var fileName = fileToDelete.Replace($"{Setup.State.Process.Configuration.S3BaseUrl}/", "");
 
         try
         {
@@ -125,7 +125,7 @@ internal static class CdnCommands
         [Parameter("name")] [Description("The name of the file to check.")]
         string name)
     {
-        name = name.Replace(Setup.State.Process.Configuration.S3.BaseUrl, "").Trim('/');
+        name = name.Replace(Setup.State.Process.Configuration.S3BaseUrl, "").Trim('/');
 
         try
         {

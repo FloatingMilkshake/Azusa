@@ -13,7 +13,7 @@ internal static class LinkCommands
         [Parameter("key"), Description("The key for the link to get.")]
         string key)
     {
-        if (Setup.State.Process.Configuration.ShortLinks.BaseUrl is null)
+        if (Setup.State.Process.Configuration.ShortLinksBaseUrl is null)
         {
             await ctx.RespondAsync("Error: No base URL provided! Make sure the baseUrl field under shortLinks in your config.json file is set.");
             return;
@@ -23,7 +23,7 @@ internal static class LinkCommands
 
         var httpClient = new HttpClient(new HttpClientHandler() { AllowAutoRedirect = false });
 
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{Setup.State.Process.Configuration.ShortLinks.BaseUrl}{key}");
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{Setup.State.Process.Configuration.ShortLinksBaseUrl}{key}");
         foreach (var header in Setup.Constants.HttpClient.DefaultRequestHeaders)
         {
             request.Headers.Add(header.Key, header.Value);
@@ -61,25 +61,25 @@ internal static class LinkCommands
 
         if (key[0] == '/' && key.Length > 1) key = key[1..];
 
-        if (Setup.State.Process.Configuration.ShortLinks.BaseUrl is null)
+        if (Setup.State.Process.Configuration.ShortLinksBaseUrl is null)
         {
             await ctx.RespondAsync("Error: No base URL provided! Make sure the baseUrl field under shortLinks in your config.json file is set.");
             return;
         }
 
-        if (Setup.State.Process.Configuration.ShortLinks.Secret is null)
+        if (Environment.GetEnvironmentVariable("SHORT_LINKS_SECRET") is null)
         {
             await ctx.RespondAsync("Error: No secret provided! Make sure the secret field under shortLinks in your config.json file is set.");
             return;
         }
 
         var request = key is "random" or "rand"
-            ? new HttpRequestMessage(HttpMethod.Post, Setup.State.Process.Configuration.ShortLinks.BaseUrl)
+            ? new HttpRequestMessage(HttpMethod.Post, Setup.State.Process.Configuration.ShortLinksBaseUrl)
             : key[0] == '/'
-                ? new HttpRequestMessage(HttpMethod.Put, $"{Setup.State.Process.Configuration.ShortLinks.BaseUrl}{key}")
-                : new HttpRequestMessage(HttpMethod.Put, $"{Setup.State.Process.Configuration.ShortLinks.BaseUrl}/{key}");
+                ? new HttpRequestMessage(HttpMethod.Put, $"{Setup.State.Process.Configuration.ShortLinksBaseUrl}{key}")
+                : new HttpRequestMessage(HttpMethod.Put, $"{Setup.State.Process.Configuration.ShortLinksBaseUrl}/{key}");
 
-        request.Headers.Add("Authorization", Setup.State.Process.Configuration.ShortLinks.Secret);
+        request.Headers.Add("Authorization", Environment.GetEnvironmentVariable("SHORT_LINKS_SECRET"));
         request.Headers.Add("URL", url);
 
         HttpResponseMessage response;
@@ -117,17 +117,17 @@ internal static class LinkCommands
     {
         if (url[0] == '/') url = url[1..];
 
-        var baseUrl = Setup.State.Process.Configuration.ShortLinks.BaseUrl;
+        var baseUrl = Setup.State.Process.Configuration.ShortLinksBaseUrl;
         if (!url.Contains(baseUrl)) url = $"{baseUrl}/{url}";
 
-        if (Setup.State.Process.Configuration.ShortLinks.Secret is null)
+        if (Environment.GetEnvironmentVariable("SHORT_LINKS_SECRET") is null)
         {
             await ctx.RespondAsync("Error: No secret provided! Make sure the secret field under shortLinks in your config.json file is set.");
             return;
         }
 
         HttpRequestMessage request = new(HttpMethod.Delete, url);
-        request.Headers.Add("Authorization", Setup.State.Process.Configuration.ShortLinks.Secret);
+        request.Headers.Add("Authorization", Environment.GetEnvironmentVariable("SHORT_LINKS_SECRET"));
 
         HttpResponseMessage response;
         try
@@ -166,8 +166,8 @@ internal static class LinkCommands
     {
         await ctx.RespondAsync("Working on it...");
     
-        HttpRequestMessage request = new(HttpMethod.Get, Setup.State.Process.Configuration.ShortLinks.BaseUrl);
-        request.Headers.Add("Authorization", Setup.State.Process.Configuration.ShortLinks.Secret);
+        HttpRequestMessage request = new(HttpMethod.Get, Setup.State.Process.Configuration.ShortLinksBaseUrl);
+        request.Headers.Add("Authorization", Environment.GetEnvironmentVariable("SHORT_LINKS_SECRET"));
     
         var response = await Setup.Constants.HttpClient.SendAsync(request);
     
