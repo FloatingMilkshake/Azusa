@@ -1,6 +1,6 @@
 ﻿services:
   bot:
-    image: ghcr.io/floatingmilkshake/azusa
+    image: git.milkshake.services/floatingmilkshake/azusa
     restart: on-failure
     volumes:
       - type: bind
