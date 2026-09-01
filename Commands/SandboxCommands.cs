@@ -7,8 +7,8 @@
 [AllowedProcessors(typeof(TextCommandProcessor))]
 internal static class SandboxCommands
 {
-    const ulong SandboxChannelId = 1493427927830761664;
-    private static readonly List<ulong> ProtectedRoles = [799644062973427743, 1494908968970096791];
+    const ulong SandboxChannelId = 1514497871087407236;
+    private static readonly List<ulong> ProtectedRoles = [799644062973427743];
 
     [Command("allow")]
     [Description("Allow access to the sandbox.")]
