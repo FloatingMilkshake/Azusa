@@ -8,9 +8,6 @@
 
     <ItemGroup>
         <PackageReference Include="Abyssal.HumanDateParser" Version="2.0.0-20191113.1" />
-        <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02613" />
-        <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02613" />
-        <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02613" />
         <PackageReference Include="Microsoft.CodeAnalysis.Scripting" Version="5.9.0" />
         <PackageReference Include="MimeTypeMapOfficial" Version="1.0.17" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
@@ -25,6 +22,12 @@
         <None Update="config.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DSharpPlus\DSharpPlus\DSharpPlus.csproj" />
+      <ProjectReference Include="..\DSharpPlus\DSharpPlus.Commands\DSharpPlus.Commands.csproj" />
+      <ProjectReference Include="..\DSharpPlus\DSharpPlus.Interactivity\DSharpPlus.Interactivity.csproj" />
     </ItemGroup>
 
 </Project>
