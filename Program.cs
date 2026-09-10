@@ -88,7 +88,7 @@ internal static class Program
 
         await Setup.State.Discord.Client.ConnectAsync();
 
-        Setup.Constants.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Azusa (https://github.com/FloatingMilkshake/Azusa)");
+        Setup.Constants.HttpClient.DefaultRequestHeaders.UserAgent.ParseAdd("Azusa/1.0 (bots@milkshake.services)");
 
         await Task.Run(async () => Tasks.CleanupTasks.ExecuteAsync());
 
