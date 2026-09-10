@@ -11,6 +11,7 @@ internal static class MessageEvents
     {
         List<string> matches = [
             "node_exporter",
+            "prometheus",
             "forgejo",
             "jellyfin",
             "monitorss",
