@@ -1,13 +1,14 @@
 ﻿FROM --platform=${BUILDPLATFORM} mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build-env
-WORKDIR /app
+WORKDIR /build
 COPY *.csproj ./
 RUN dotnet restore
 COPY . ./
 RUN dotnet build Azusa.csproj -c Release -o out
+
 FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine
 LABEL com.centurylinklabs.watchtower.enable="true"
 WORKDIR /app
-COPY --from=build-env /app/out .
-RUN apk add redis icu-libs iputils-ping imagemagick rclone --no-cache
+RUN apk add redis icu-libs iputils-ping --no-cache
+COPY --from=build-env /build/out .
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENTRYPOINT ["dotnet", "Azusa.dll"]
