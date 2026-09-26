@@ -17,7 +17,7 @@ internal static class Program
         #region set up logging
         var logConfig = new LoggerConfiguration().WriteTo.Console(theme: AnsiConsoleTheme.Sixteen).MinimumLevel.Override("System.Net.Http", Serilog.Events.LogEventLevel.Error);
 #if DEBUG
-        logConfig.MinimumLevel.Debug();
+        logConfig.MinimumLevel.Verbose();
 #else
         logConfig.MinimumLevel.Debug();
 #endif
