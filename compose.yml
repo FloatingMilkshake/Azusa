@@ -10,6 +10,15 @@
       - type: bind
         source: ./config.json
         target: /app/config.json
+        read_only: true
+      - type: bind
+        source: ./id_ed25519
+        target: /app/id_ed25519
+        read_only: true
+      - type: bind
+        source: ./known_hosts
+        target: /app/known_hosts
+        read_only: true
     env_file: .env
     labels: [ "com.centurylinklabs.watchtower.scope=autoupdate" ]
   redis:
