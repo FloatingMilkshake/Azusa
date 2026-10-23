@@ -6,17 +6,22 @@ namespace Azusa.Commands;
 [RequireApplicationOwner]
 internal static class CICommands
 {
-    [Command("query")]
+    [Command("status")]
     [Description("Get the current state of things.")]
     public static async Task CIQueryCommandAsync(TextCommandContext ctx)
     {
         await ctx.RespondAsync("Working on it...");
+
+        string response = "**Pool State**\n";
+        var queryResult = await Setup.Types.ShellCommand.RunAsync("ssh -o UserKnownHostsFile=/app/known_hosts -i id_ed25519 toggle-ctl@mizuki query", CancellationToken.None);
+        response += queryResult.Output.Trim() + "\n";
+        response += "\n**Timer State**\n";
+        var timerResult = await Setup.Types.ShellCommand.RunAsync("ssh -o UserKnownHostsFile=/app/known_hosts -i id_ed25519 toggle-ctl@mizuki timer", CancellationToken.None);
+        response += timerResult.Output.Trim();
         
-        var result = await Setup.Types.ShellCommand.RunAsync("ssh -o UserKnownHostsFile=/app/known_hosts -i id_ed25519 toggle-ctl@mizuki query", CancellationToken.None);
-        
-        await ctx.EditResponseAsync(result.ExitCode == 0
-            ? result.Output
-            : $"Failed to query with exit code {result.ExitCode}...\n```\n{result.Output}\n```");
+        await ctx.EditResponseAsync(queryResult.ExitCode != 0 || timerResult.ExitCode != 0
+            ? $"Failed to check status. Query check exited {queryResult.ExitCode}, timer check exited {timerResult.ExitCode}."
+            : response);
     }
 
     [Command("override")]
