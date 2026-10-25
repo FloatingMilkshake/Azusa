@@ -21,8 +21,10 @@ internal static class MessageEvents
             "caddy",
             "anubis",
             "immich",
-	        "wivrn",
-            "snapraid"
+            "wivrn",
+            "snapraid",
+            "tubearchivist",
+            "veracrypt"
         ];
 
         if ((e.Message.Author.Id == 944784076735414342 || e.Message.WebhookMessage.Value)
