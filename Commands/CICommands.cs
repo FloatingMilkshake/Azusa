@@ -8,13 +8,16 @@ internal static class CICommands
 {
     [Command("status")]
     [Description("Get the current state of things.")]
-    public static async Task CIQueryCommandAsync(TextCommandContext ctx)
+    public static async Task CIStatusCommandAsync(TextCommandContext ctx)
     {
-        await ctx.RespondAsync("Working on it...");
+        await ctx.RespondAsync("Reading pool state...");
 
         string response = "**Pool State**\n";
         var queryResult = await Setup.Types.ShellCommand.RunAsync("ssh -o UserKnownHostsFile=/app/known_hosts -i id_ed25519 toggle-ctl@mizuki query", CancellationToken.None);
         response += queryResult.Output.Trim() + "\n";
+
+        await ctx.EditResponseAsync("Reading timer state...");
+
         response += "\n**Timer State**\n";
         var timerResult = await Setup.Types.ShellCommand.RunAsync("ssh -o UserKnownHostsFile=/app/known_hosts -i id_ed25519 toggle-ctl@mizuki timer", CancellationToken.None);
         response += timerResult.Output.Trim();
@@ -28,7 +31,7 @@ internal static class CICommands
     [Description("Override the pool timer and enable large runners.")]
     public static async Task CIOverrideCommandAsync(TextCommandContext ctx, int hours = 0)
     {
-        await ctx.RespondAsync("Working on it...");
+        await ctx.RespondAsync("Connecting...");
 
         if (hours == 0)
         {
@@ -48,8 +51,10 @@ internal static class CICommands
     [Description("Reset the override and automatically manage runners.")]
     public static async Task CIResetCommandAsync(TextCommandContext ctx)
     {
+        await ctx.RespondAsync("Connecting...");
+
         await Setup.Types.ShellCommand.RunAsync("ssh -o UserKnownHostsFile=/app/known_hosts -i id_ed25519 toggle-ctl@mizuki auto", CancellationToken.None);
 
-        await ctx.RespondAsync("Reset!");
+        await ctx.EditResponseAsync("Reset!");
     }
 }

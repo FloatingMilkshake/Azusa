@@ -14,7 +14,7 @@ internal class ShellCommands
         [Parameter("command")] [Description("The command to run, including any arguments.")] [RemainingText]
         string command)
     {
-        await ctx.RespondAsync(new DiscordMessageBuilder().WithContent("Working on it...")
+        await ctx.RespondAsync(new DiscordMessageBuilder().WithContent("Executing...")
             .AddActionRowComponent(new DiscordActionRowComponent(
                 [new DiscordButtonComponent(DiscordButtonStyle.Danger, "button-callback-eval-cancel", "Cancel")]
             ))

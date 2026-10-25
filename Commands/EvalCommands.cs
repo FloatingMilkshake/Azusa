@@ -10,7 +10,7 @@ internal static class EvalCommands
     {
         CancellationToken cancellationToken = default;
 
-        var builder = new DiscordMessageBuilder().WithContent("Working on it...");
+        var builder = new DiscordMessageBuilder().WithContent("Evaluating...");
 
         await ctx.RespondAsync(builder);
         var msg = await ctx.GetResponseAsync();

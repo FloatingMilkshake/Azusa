@@ -164,7 +164,7 @@ internal static class LinkCommands
         [Parameter("match_values")] [Description("Optionally filter by value.")]
         string valueFilter = "")
     {
-        await ctx.RespondAsync("Working on it...");
+        await ctx.RespondAsync("Listing...");
     
         HttpRequestMessage request = new(HttpMethod.Get, Setup.State.Process.Configuration.ShortLinksBaseUrl);
         request.Headers.Add("Authorization", Environment.GetEnvironmentVariable("SHORT_LINKS_SECRET"));

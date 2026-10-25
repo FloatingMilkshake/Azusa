@@ -8,11 +8,15 @@ internal static class InteractionEvents
         {
             case "button-callback-eval-cancel":
                 {
+                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.DeferredMessageUpdate);
+
+                    bool isShell = e.Message.Content == "Executing...";
+
                     if (!Setup.State.Caches.CancellationTokens.TryGetValue(e.Message.Id, out CancellationTokenSource cancellationTokenSource))
                     {
-                        await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent("Working on it...")
+                        await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent(isShell ? "Executing..." : "Evaluating...")
                         .AddActionRowComponent(new DiscordActionRowComponent(
-                            [new DiscordButtonComponent(DiscordButtonStyle.Danger, "button-callback-eval-cancel", "Failed to Cancel", true)]
+                            [new DiscordButtonComponent(DiscordButtonStyle.Danger, "button-callback-eval-cancel", "Can't cancel (CToken missing!)", true)]
                         )));
                         return;
                     }
@@ -25,9 +29,7 @@ internal static class InteractionEvents
                         return;
                     }
 
-                    await e.Interaction.CreateResponseAsync(DiscordInteractionResponseType.DeferredMessageUpdate);
-
-                    await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent("Working on it...")
+                    await e.Message.ModifyAsync(new DiscordMessageBuilder().WithContent(isShell ? "Executing..." : "Evaluating...")
                         .AddActionRowComponent(new DiscordActionRowComponent(
                             [new DiscordButtonComponent(DiscordButtonStyle.Danger, "button-callback-eval-cancel", "Cancelling...", true)]
                         )));
