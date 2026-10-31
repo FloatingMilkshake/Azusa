@@ -24,7 +24,8 @@ internal static class MessageEvents
             "wivrn",
             "snapraid",
             "tubearchivist",
-            "veracrypt"
+            "veracrypt",
+            "vscode"
         ];
 
         if ((e.Message.Author.Id == 944784076735414342 || e.Message.WebhookMessage.Value)
