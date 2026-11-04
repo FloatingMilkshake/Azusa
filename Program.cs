@@ -24,9 +24,9 @@ internal static class Program
 
         if (Setup.State.Process.Configuration.GrafanaLokiUrl is not null)
         {
-            var discordBot = "azusa";
+            var discordBot = "azusa_fluxer";
 #if DEBUG
-            discordBot = "azusa_dev";
+            discordBot = "azusa_fluxer_dev";
 #endif
             logConfig.WriteTo.GrafanaLoki(Setup.State.Process.Configuration.GrafanaLokiUrl, [new LokiLabel { Key = "discord_bot", Value = discordBot }]);
         }

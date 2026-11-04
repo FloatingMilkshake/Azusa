@@ -1,5 +1,7 @@
 ﻿FROM --platform=${BUILDPLATFORM} mcr.microsoft.com/dotnet/sdk:10.0.403-alpine3.24 AS build-env
 WORKDIR /build
+COPY --from=dsharpplus . ./DSharpPlus
+WORKDIR /build/Azusa
 COPY *.csproj ./
 RUN dotnet restore
 COPY . ./
@@ -9,6 +11,6 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0.14-alpine3.24
 LABEL com.centurylinklabs.watchtower.enable="true"
 WORKDIR /app
 RUN apk add redis icu-libs iputils-ping openssh-client --no-cache
-COPY --from=build-env /build/out .
+COPY --from=build-env /build/Azusa/out .
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENTRYPOINT ["dotnet", "Azusa.dll"]

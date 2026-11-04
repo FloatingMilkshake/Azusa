@@ -1,6 +1,9 @@
 ﻿services:
   bot:
-    image: git.milkshake.services/floatingmilkshake/azusa
+    build:
+      context: .
+      additional_contexts:
+        dsharpplus: ../DSharpPlus
     restart: on-failure
     volumes:
       - type: bind
